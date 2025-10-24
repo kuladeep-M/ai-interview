@@ -1,3 +1,129 @@
+// AI speaking indicator styles
+.ai-speaking-indicator {
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+    font-size: 0.95rem;
+    color: #00C9A7;
+}
+.ai-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00C9A7;
+    margin-right: 6px;
+    animation: ai-pulse 1s infinite;
+}
+.ai-speaking-label {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+@keyframes ai-pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+    100% { opacity: 1; transform: scale(1); }
+}
+// Floating indicator bar for listening state when user speaking text is off
+.input-indicator-bar {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ede7f6;
+    color: #6C63FF;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(100, 100, 150, 0.08);
+    padding: 8px 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+}
+// Input indicator for live user speech
+.input-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: #b39ddb;
+    margin-top: 2px;
+}
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b39ddb;
+    margin-right: 6px;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+    100% { opacity: 1; transform: scale(1); }
+}
+/* Minimal chat UI */
+.chat-window.minimal-chat {
+    background: transparent;
+    padding: 0.5rem 0.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.minimal-bubble {
+    border-radius: 10px;
+    box-shadow: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    max-width: 70%;
+    position: relative;
+    font-size: 0.92rem;
+}
+.minimal-bubble.ai {
+    align-self: flex-start;
+}
+.minimal-bubble.user {
+    align-self: flex-end;
+}
+.minimal-bubble.live {
+    border: 1px dashed #5d5cff;
+    background: #e3e7ff;
+}
+.minimal-avatar {
+    font-size: 1.2rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    background: #f0f0f0;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+}
+.minimal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.minimal-text {
+    font-size: 0.92rem;
+    word-break: break-word;
+    color: #222;
+}
+.live-typing {
+    font-style: italic;
+    color: #4caf50;
+    animation: blink 1s infinite;
+}
+.minimal-timestamp {
+    font-size: 0.7rem;
+    color: #888;
+    align-self: flex-end;
+}
 /* --- Global Reset and Main Layout --- */
 .interview-page-container {
     display: flex;
@@ -160,6 +286,7 @@
     font-weight: 600;
     color: #5d5cff;
     margin-bottom: 10px;
+    margin-top: 4px;
 }
 .speaking-indicator {
     color: green;

@@ -1,3 +1,6 @@
+          <div *ngIf="!showUserSpeakingText() && isRecordingActive" class="input-indicator-bar">
+            <span class="pulse-dot"></span> Listening for input...
+          </div>
 <div class="interview-page-container">
 
   <aside class="sidebar-panel">
@@ -21,8 +24,12 @@
         <input type="checkbox" id="speech-rec" checked>
       </div>
       <div class="setting-item">
-        <label for="show-text">Show Speech Text</label>
-        <input type="checkbox" id="show-text">
+        <label for="show-ai-text">Show AI Speaking Text</label>
+        <input type="checkbox" id="show-ai-text" [checked]="showAISpeakingText()" (change)="toggleShowAISpeakingText($event)">
+      </div>
+      <div class="setting-item">
+        <label for="show-user-text">Show User Speaking Text</label>
+        <input type="checkbox" id="show-user-text" [checked]="showUserSpeakingText()" (change)="toggleShowUserSpeakingText($event)">
       </div>
       <div class="setting-item">
         <label for="helper-tools">Helper Tools</label>
@@ -59,17 +66,83 @@
     <section class="ai-question-block">
       <div class="ai-avatar">🤖</div>
       <div class="ai-speech-bubble">
-        <p class="ai-status">AI Interviewer <span class="speaking-indicator">🗣 Speaking...</span></p>
-        @for (chat of conversationHistory; track chat; let i = $index) {
-          <p>
-            <span class="chat-speaker" [ngClass]="chat.speaker">{{ chat.speaker === 'ai' ? '🤖' : '🧑' }}</span>
-            <span class="chat-text">{{ chat.text }}</span>
-          </p>
-        }
-        <p *ngIf="liveTranscript()">
-          <span class="chat-speaker user">🧑</span>
-          <span class="chat-text">{{ liveTranscript() }}</span>
+        <p class="ai-status">
+          <span style="color: #5d5cff; font-weight: 600;">AI Interviewer</span>
+          <span *ngIf="aiSpeaking() && !showAISpeakingText() && !showUserSpeakingText()" class="ai-top-speaking-indicator" style="margin-left: 12px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" style="vertical-align: middle; margin-right: 4px;">
+              <circle cx="11" cy="11" r="10" fill="#388e3c"/>
+              <path d="M11 6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2v2" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <animateTransform attributeName="transform" type="scale" values="1;1.2;1" dur="1s" repeatCount="indefinite"/>
+            </svg>
+            <span style="color: #388e3c; font-weight: 600; font-size: 1.1em;">Speaking...</span>
+          </span>
+          <span *ngIf="aiSpeaking() && (showAISpeakingText() || showUserSpeakingText())" class="ai-speaking-indicator" style="margin-left: 12px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" style="vertical-align: middle; margin-right: 4px;">
+              <circle cx="11" cy="11" r="10" fill="#388e3c"/>
+              <path d="M11 6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2v2" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <animateTransform attributeName="transform" type="scale" values="1;1.2;1" dur="1s" repeatCount="indefinite"/>
+            </svg>
+            <span style="color: #388e3c; font-weight: 600; font-size: 1.1em;">Speaking...</span>
+          </span>
         </p>
+        <ng-container *ngIf="showAISpeakingText() || showUserSpeakingText(); else speakingIndicator">
+          <div class="chat-window minimal-chat" #chatWindow>
+            @for (chat of conversationHistory.slice(-4); track chat; let i = $index) {
+              <div *ngIf="chat.speaker === 'ai' ? showAISpeakingText() : showUserSpeakingText()" class="chat-bubble minimal-bubble" [ngClass]="chat.speaker">
+                <div class="avatar minimal-avatar">
+                  <ng-container *ngIf="chat.speaker === 'ai'; else userKAvatar">
+                    <!-- Robot/Computer SVG Avatar for AI -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="4" y="6" width="16" height="12" rx="3" fill="#00C9A7" stroke="#222" stroke-width="1.5"/>
+                      <rect x="8" y="10" width="8" height="4" rx="2" fill="#fff"/>
+                      <circle cx="7" cy="9" r="1" fill="#222"/>
+                      <circle cx="17" cy="9" r="1" fill="#222"/>
+                      <rect x="10" y="18" width="4" height="2" rx="1" fill="#00C9A7" stroke="#222" stroke-width="1"/>
+                    </svg>
+                  </ng-container>
+                  <ng-template #userKAvatar>
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <filter id="kShadow" x="0" y="0" width="32" height="32">
+                            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#888" flood-opacity="0.25"/>
+                          </filter>
+                        </defs>
+                          <circle cx="20" cy="20" r="16" fill="#6C63FF" filter="url(#kShadow)"/>
+                          <text x="20" y="24" text-anchor="middle" font-size="18" fill="#fff" font-family="Arial, sans-serif" dominant-baseline="middle">K</text>
+                      </svg>
+                  </ng-template>
+                </div>
+                <div class="bubble-content minimal-content">
+                  <span class="chat-text minimal-text">{{ chat.text }}</span>
+                  <span *ngIf="chat.speaker === 'ai' && aiSpeaking()" class="ai-speaking-indicator">
+                    <span class="ai-pulse-dot"></span>
+                    <span class="ai-speaking-label">Speaking...</span>
+                  </span>
+                </div>
+              </div>
+            }
+              <div *ngIf="isRecordingActive" class="chat-bubble user live minimal-bubble" (ngAfterViewInit)="chatWindow.scrollTop = chatWindow.scrollHeight" (ngOnChanges)="chatWindow.scrollTop = chatWindow.scrollHeight">
+                <div class="avatar minimal-avatar">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="20" r="14" fill="#6C63FF"/>
+                    <text x="16" y="22" text-anchor="middle" font-size="16" fill="#fff" font-family="Arial, sans-serif" dominant-baseline="middle">K</text>
+                  </svg>
+                </div>
+                  <div class="bubble-content minimal-content">
+                    <span *ngIf="showUserSpeakingText()" class="chat-text live-typing minimal-text">{{ liveTranscript() }}</span>
+                    <span *ngIf="showUserSpeakingText()" class="timestamp minimal-timestamp">speaking...</span>
+                    <span class="input-indicator">
+                      <span class="pulse-dot"></span> Listening for input...
+                    </span>
+                  </div>
+                </div>
+          </div>
+        </ng-container>
+        <ng-template #speakingIndicator>
+          <div *ngIf="showUserSpeakingText() && (liveTranscript() || userSpeakingIndicator())" class="user-speaking-indicator">
+            🧑 User is speaking...
+          </div>
+        </ng-template>
       </div>
     </section>
 

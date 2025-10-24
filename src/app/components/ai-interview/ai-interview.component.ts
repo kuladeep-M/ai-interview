@@ -12,6 +12,24 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  public helperTools: WritableSignal<boolean> = signal(false);
+  public userName: string = 'Kuladeep';
+  get userInitial(): string {
+    return this.userName ? this.userName.charAt(0).toUpperCase() : 'U';
+  }
+  public userSpeakingIndicator: WritableSignal<boolean> = signal(false);
+  public showAISpeakingText: WritableSignal<boolean> = signal(true);
+  public showUserSpeakingText: WritableSignal<boolean> = signal(true);
+  // ...existing code...
+  // Place this method inside the class, after properties and before lifecycle hooks or other methods
+  toggleShowAISpeakingText(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.showAISpeakingText.set(input.checked);
+  }
+  toggleShowUserSpeakingText(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.showUserSpeakingText.set(input.checked);
+  }
   private interimTranscriptBuffer: string = '';
   public liveTranscript: WritableSignal<string> = signal('');
   // Removed ChangeDetectorRef injection; signals now handle reactivity
@@ -121,6 +139,10 @@ export class AiInterviewComponent implements OnInit {
               this.processUserResponse(this.lastTranscriptChunk);
               this.interimTranscriptBuffer = '';
               this.liveTranscript.set('');
+              this.userSpeakingIndicator.set(true);
+              setTimeout(() => {
+                this.userSpeakingIndicator.set(false);
+              }, 1000);
               this.finalTranscriptSegments = [];
             }
           }
