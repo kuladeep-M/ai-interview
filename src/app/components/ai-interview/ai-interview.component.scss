@@ -1,3 +1,96 @@
+.vertical-controls {
+    align-items: center;
+    display: flex;
+    gap: 12px !important;
+    margin-right: 32px;
+}
+// Beautiful icon styles for response controls
+.icon-mic svg {
+    display: block;
+    margin: auto;
+}
+.icon-text svg {
+    display: block;
+    margin: auto;
+}
+.icon-code svg {
+    display: block;
+    margin: auto;
+}
+.icon-skip svg {
+    display: block;
+    margin-right: 8px;
+}
+.icon-submit svg {
+    display: block;
+    margin-right: 8px;
+}
+.btn-mic {
+    background: none;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(236, 64, 122, 0.12);
+    transition: box-shadow 0.2s;
+}
+.btn-mic.active {
+    box-shadow: 0 4px 16px rgba(236, 64, 122, 0.18);
+}
+.btn-text-mode, .btn-code-mode {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border 0.2s;
+}
+.btn-text-mode.active, .btn-code-mode.active {
+    border: 2px solid #b39ddb;
+}
+.btn-code-mode.active {
+    border-color: #80deea;
+}
+.btn-skip {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 0 24px;
+    height: 48px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin: auto;
+    transition: border 0.2s;
+}
+.btn-submit {
+    background: #5d5cff;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0 32px;
+    height: 48px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(93, 92, 255, 0.12);
+    transition: box-shadow 0.2s;
+}
+.btn-submit:hover {
+    box-shadow: 0 4px 16px rgba(93, 92, 255, 0.18);
+}
 // AI speaking indicator styles
 .ai-speaking-indicator {
     display: flex;
@@ -177,8 +270,23 @@
 /* Settings Section */
 .setting-item {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
+    gap: 48px;
+    margin-top: 32px;
+.control-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+.control-group.center {
+    justify-content: center;
+}
+.control-group.right {
+    justify-content: flex-end;
+}
     margin-bottom: 10px;
 }
 

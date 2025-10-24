@@ -114,7 +114,7 @@
                 </div>
                 <div class="bubble-content minimal-content">
                   <span class="chat-text minimal-text">{{ chat.text }}</span>
-                  <span *ngIf="chat.speaker === 'ai' && aiSpeaking()" class="ai-speaking-indicator">
+                  <span *ngIf="chat.speaker === 'ai' && aiSpeaking() && !isRecordingActive" class="ai-speaking-indicator">
                     <span class="ai-pulse-dot"></span>
                     <span class="ai-speaking-label">Speaking...</span>
                   </span>
@@ -169,34 +169,61 @@
 
 
       <div class="response-controls">
+       
         <div class="control-group left">
+          <button class="btn btn-skip">
+            <span class="icon-skip">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <rect x="2" y="6" width="24" height="16" rx="4" fill="#90CAF9"/>
+                <polygon points="10,10 18,14 10,18" fill="#fff"/>
+              </svg>
+            </span>
+            <span class="skip-label">Pass / Skip</span>
+          </button>
+        </div>
+         <div class="control-group center vertical-controls">
           <button class="btn btn-mic" (click)="toggleRecording()"
             [disabled]="aiSpeaking() || activeInputMode() !== 'speech'"
             [class.active]="isRecordingActive && activeInputMode() === 'speech'">
-
-            {{ isRecordingActive ? '⏸' : '🎤' }}
+            <span class="icon-mic">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="16" fill="#EC407A"/>
+                <rect x="13" y="8" width="6" height="12" rx="3" fill="#fff"/>
+                <rect x="15" y="20" width="2" height="4" rx="1" fill="#fff"/>
+                <rect x="12" y="24" width="8" height="2" rx="1" fill="#fff"/>
+              </svg>
+            </span>
           </button>
-
           <button class="btn btn-text-mode" (click)="setInputMode('text')"
             [class.active]="activeInputMode() === 'text'">
-
-            ⌨️
+            <span class="icon-text">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="6" y="8" width="20" height="16" rx="4" fill="#B39DDB"/>
+                <rect x="10" y="12" width="12" height="2" rx="1" fill="#fff"/>
+                <rect x="10" y="16" width="8" height="2" rx="1" fill="#fff"/>
+              </svg>
+            </span>
           </button>
-
           <button class="btn btn-code-mode" (click)="setInputMode('code')"
             [class.active]="activeInputMode() === 'code'">
-
-            &lt;/&gt;
+            <span class="icon-code">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="6" y="8" width="20" height="16" rx="4" fill="#80DEEA"/>
+                <path d="M13 16l-3 3 3 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 16l3 3-3 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
           </button>
         </div>
-
-        <div class="control-group center">
-          <button class="btn btn-skip">▶️ Pass / Skip</button>
-        </div>
-
         <div class="control-group right">
           <button class="btn btn-submit" (click)="submitAnswer()">
-            <span class="icon">✈️</span> Submit Answer
+            <span class="icon-submit">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="2" y="8" width="28" height="16" rx="8" fill="#5d5cff"/>
+                <path d="M10 16h12M18 12l4 4-4 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="submit-label">Submit Answer</span>
           </button>
         </div>
       </div>

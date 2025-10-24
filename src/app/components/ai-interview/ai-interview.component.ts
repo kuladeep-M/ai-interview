@@ -77,6 +77,8 @@ export class AiInterviewComponent implements OnInit {
   }
 
   startRecording(): void {
+    // Stop AI speaking immediately when user starts speaking
+    this.aiSpeaking.set(false);
     if (!this.recordSubscription) {
       // 1. Initial Start: Subscribe to the service's stream once
       this.recordSubscription = this.speechService.record$.subscribe({
