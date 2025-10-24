@@ -60,9 +60,16 @@
       <div class="ai-avatar">🤖</div>
       <div class="ai-speech-bubble">
         <p class="ai-status">AI Interviewer <span class="speaking-indicator">🗣 Speaking...</span></p>
-        <p class="question-text">Great! Now let's move to a coding challenge. Can you implement a binary search
-          algorithm in JavaScript? Please write a function that takes a sorted array and a target value, then returns
-          the index of the target or -1 if not found.</p>
+        @for (chat of conversationHistory; track chat; let i = $index) {
+          <p>
+            <span class="chat-speaker" [ngClass]="chat.speaker">{{ chat.speaker === 'ai' ? '🤖' : '🧑' }}</span>
+            <span class="chat-text">{{ chat.text }}</span>
+          </p>
+        }
+        <p *ngIf="liveTranscript()">
+          <span class="chat-speaker user">🧑</span>
+          <span class="chat-text">{{ liveTranscript() }}</span>
+        </p>
       </div>
     </section>
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal, ChangeDetectorRef } from '@angular/core';
 import { map, Subscription } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
 export type InputMode = 'speech' | 'text' | 'code';
@@ -12,6 +12,14 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  private interimTranscriptBuffer: string = '';
+  public liveTranscript: WritableSignal<string> = signal('');
+  // Removed ChangeDetectorRef injection; signals now handle reactivity
+  public draftTranscript: string = '';
+  private draftConfidence: number = 0;
+  // Removed debounce feature
+  // Removed draftTranscript feature
+  public conversationHistory: { speaker: 'user' | 'ai', text: string }[] = [];
   private finalTranscriptSegments: string[] = [];
   private lastTranscriptChunk: string = '';
   private speechService = inject(VoiceService);
@@ -56,35 +64,72 @@ export class AiInterviewComponent implements OnInit {
       this.recordSubscription = this.speechService.record$.subscribe({
         next: (results: any) => {
           // Extract transcript text from SpeechRecognitionResult objects
-          console.log('results',results)
-          //Buffer only isFinal=true transcript segments, avoid duplicates
+
+          // Use finalized segments for transcript and UI, and draft based on highest confidence
           if (Array.isArray(results)) {
+            // Use a persistent buffer for interim transcript
+            this.interimTranscriptBuffer = '';
             for (const result of results) {
               if (Array.isArray(result)) {
                 for (const alt of result) {
-                  if (alt && alt.transcript && alt.isFinal) {
+                  if (alt && alt.transcript) {
                     const segment = alt.transcript.trim();
-                    if (segment && !this.finalTranscriptSegments.includes(segment)) {
-                      this.finalTranscriptSegments.push(segment);
+                    if (!alt.isFinal) {
+                      // Accumulate interim segments
+                      this.interimTranscriptBuffer += (this.interimTranscriptBuffer ? ' ' : '') + segment;
+                    } else {
+                      if (segment && !this.finalTranscriptSegments.includes(segment)) {
+                        this.finalTranscriptSegments.push(segment);
+                      }
                     }
                   }
                 }
-              } else if (result && result.isFinal) {
+              } else if (result && result[0] && result[0].transcript) {
                 const segment = result[0].transcript.trim();
-                if (segment && !this.finalTranscriptSegments.includes(segment)) {
-                  this.finalTranscriptSegments.push(segment);
+                if (!result.isFinal) {
+                  this.interimTranscriptBuffer += (this.interimTranscriptBuffer ? ' ' : '') + segment;
+                } else {
+                  if (segment && !this.finalTranscriptSegments.includes(segment)) {
+                    this.finalTranscriptSegments.push(segment);
+                  }
                 }
               }
             }
+            // Show accumulated interim transcript
+            this.liveTranscript.set(this.interimTranscriptBuffer);
+            // Only clear buffer and liveTranscript if a final segment is present in the current results
+            let finalSegment = '';
+            for (const result of results) {
+              if (Array.isArray(result)) {
+                for (const alt of result) {
+                  if (alt.isFinal && alt.transcript) {
+                    finalSegment += (finalSegment ? ' ' : '') + alt.transcript.trim();
+                  }
+                }
+              } else if (result && result.isFinal && result[0] && result[0].transcript) {
+                finalSegment += (finalSegment ? ' ' : '') + result[0].transcript.trim();
+              }
+            }
+            if (finalSegment) {
+              // Immediately update chat history and finalized transcript
+              if (!this.finalTranscriptSegments.includes(finalSegment)) {
+                this.finalTranscriptSegments.push(finalSegment);
+              }
+              this.userTranscript.set(this.finalTranscriptSegments.join(' '));
+              this.lastTranscriptChunk = this.finalTranscriptSegments.join(' ');
+              this.conversationHistory.push({ speaker: 'user', text: this.lastTranscriptChunk });
+              this.processUserResponse(this.lastTranscriptChunk);
+              this.interimTranscriptBuffer = '';
+              this.liveTranscript.set('');
+              this.finalTranscriptSegments = [];
+            }
           }
-          console.log(this.finalTranscriptSegments);
-          
+          console.log('[DEBUG] Final:', this.finalTranscriptSegments, 'Live:', this.liveTranscript);
           // Show the concatenated transcript in UI
           const fullTranscript = this.finalTranscriptSegments.join(' ');
           if (fullTranscript) {
             this.userTranscript.set(fullTranscript);
             this.lastTranscriptChunk = fullTranscript;
-            console.log(this.userTranscript());
           }
           // Reset silence timer
           if (this.silenceTimeout) {
@@ -95,6 +140,8 @@ export class AiInterviewComponent implements OnInit {
             const fullTranscript = this.finalTranscriptSegments.join(' ');
             if (fullTranscript) {
               this.userTranscript.set(fullTranscript);
+              // Store user speech in conversation history
+              this.conversationHistory.push({ speaker: 'user', text: fullTranscript });
               this.processUserResponse(fullTranscript);
             }
             this.transcriptBuffer = '';
@@ -185,7 +232,9 @@ export class AiInterviewComponent implements OnInit {
     console.log('prcoessing',transcript)
     this.aiSpeaking.set(true);
     // Use the service to generate a mock speech response
-    this.speechService.speak('Processing your response...').then(() => {
+    const aiText = 'Processing your response...';
+    this.conversationHistory.push({ speaker: 'ai', text: aiText });
+    this.speechService.speak(aiText).then(() => {
       this.aiSpeaking.set(false);
       // After AI speaks, either automatically resume or wait for user input
     });
