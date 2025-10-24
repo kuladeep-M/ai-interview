@@ -1,12 +1,10 @@
 // speech-automation.service.ts - FINAL IMPLEMENTATION
 
 import { Injectable, OnDestroy, Inject } from '@angular/core';
-import { filter, map, NEVER, Observable, repeat, retry, share, shareReplay, Subject, switchMap, tap } from 'rxjs';
+import { NEVER, Observable, repeat, retry, share, Subject, switchMap, tap } from 'rxjs';
 import {
   continuous,
   final,
-  firstAlternative,
-  skipUntilSaid,
   SPEECH_SYNTHESIS_VOICES,
   SpeechRecognitionService,
   takeUntilSaid,
@@ -29,24 +27,19 @@ export class VoiceService implements OnDestroy {
     private readonly rawRecognition$: Observable<SpeechRecognitionResult[]>
   ) {
     this.recognition$ = this.rawRecognition$.pipe(
-      tap(z=> console.log("list")),
-            retry(),
-            repeat(),
-            share()        );
+      retry(),
+      repeat(),
+      share());
 
-            this.recognition$.subscribe(c=>{
-              console.log(c)
-            })
+
   }
 
   get record$() {
     return this.recordingTrigger$.pipe(
-      tap(x=> console.log(x)),
-            // switchMap is CRITICAL: when trigger is TRUE, switch to mic stream; when FALSE, switch to NEVER (stops emitting)
-            switchMap(isRecording => isRecording ? this.recognition$ : NEVER),
-            // The value 'text' here is already a string, so no need for map((m) => m.transcript)
-            tap(text => console.log(`[Service Stream] Transcript: ${text}`))
-        );
+      // switchMap is CRITICAL: when trigger is TRUE, switch to mic stream; when FALSE, switch to NEVER (stops emitting)
+      switchMap(isRecording => isRecording ? this.recognition$ : NEVER),
+      // The value 'text' here is already a string, so no need for map((m) => m.transcript)
+    );
   }
 
   speak(text: string, lang = 'en-US'): Promise<void> {
@@ -54,7 +47,8 @@ export class VoiceService implements OnDestroy {
     this.isSpeakingSubject.next(true);
 
     return new Promise((resolve) => {
-      const utter = new SpeechSynthesisUtterance(text);
+      // const utter = new SpeechSynthesisUtterance(text);
+      const utter = new SpeechSynthesisUtterance("Speaking now");
       utter.lang = lang;
 
       // Resolve the promise and update state when speaking is done

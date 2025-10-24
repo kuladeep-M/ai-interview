@@ -12,11 +12,15 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  private finalTranscriptSegments: string[] = [];
+  private lastTranscriptChunk: string = '';
   private speechService = inject(VoiceService);
   private recordSubscription: Subscription | null = null;
 
   // UI State Signals
   public userTranscript: WritableSignal<string> = signal('Press mic to start speaking.');
+  private transcriptBuffer: string = '';
+  private silenceTimeout: any = null;
   public aiSpeaking: WritableSignal<boolean> = signal(false);
   public isRecordingActive: boolean = false;
 
@@ -50,9 +54,53 @@ export class AiInterviewComponent implements OnInit {
     if (!this.recordSubscription) {
       // 1. Initial Start: Subscribe to the service's stream once
       this.recordSubscription = this.speechService.record$.subscribe({
-        next: (transcript: any) => {
-          this.userTranscript.set(transcript);
-          this.processUserResponse(transcript);
+        next: (results: any) => {
+          // Extract transcript text from SpeechRecognitionResult objects
+          console.log('results',results)
+          //Buffer only isFinal=true transcript segments, avoid duplicates
+          if (Array.isArray(results)) {
+            for (const result of results) {
+              if (Array.isArray(result)) {
+                for (const alt of result) {
+                  if (alt && alt.transcript && alt.isFinal) {
+                    const segment = alt.transcript.trim();
+                    if (segment && !this.finalTranscriptSegments.includes(segment)) {
+                      this.finalTranscriptSegments.push(segment);
+                    }
+                  }
+                }
+              } else if (result && result.isFinal) {
+                const segment = result[0].transcript.trim();
+                if (segment && !this.finalTranscriptSegments.includes(segment)) {
+                  this.finalTranscriptSegments.push(segment);
+                }
+              }
+            }
+          }
+          console.log(this.finalTranscriptSegments);
+          
+          // Show the concatenated transcript in UI
+          const fullTranscript = this.finalTranscriptSegments.join(' ');
+          if (fullTranscript) {
+            this.userTranscript.set(fullTranscript);
+            this.lastTranscriptChunk = fullTranscript;
+            console.log(this.userTranscript());
+          }
+          // Reset silence timer
+          if (this.silenceTimeout) {
+            clearTimeout(this.silenceTimeout);
+          }
+          this.silenceTimeout = setTimeout(() => {
+            // After 5 seconds of silence, process the full concatenated transcript
+            const fullTranscript = this.finalTranscriptSegments.join(' ');
+            if (fullTranscript) {
+              this.userTranscript.set(fullTranscript);
+              this.processUserResponse(fullTranscript);
+            }
+            this.transcriptBuffer = '';
+            this.finalTranscriptSegments = [];
+            // Do NOT stop recording; keep it active for ongoing interview
+          }, 5000);
         },
         error: (err) => {
           console.error('Recording error:', err);
@@ -79,6 +127,12 @@ export class AiInterviewComponent implements OnInit {
     if (this.recordSubscription) {
       this.recordSubscription.unsubscribe();
       this.recordSubscription = null;
+    }
+    // Clear transcript buffer and silence timer
+    this.transcriptBuffer = '';
+    if (this.silenceTimeout) {
+      clearTimeout(this.silenceTimeout);
+      this.silenceTimeout = null;
     }
     // Tell the service to fully stop
     this.speechService.stopRecording();
