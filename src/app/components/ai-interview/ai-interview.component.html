@@ -1,0 +1,125 @@
+<div class="interview-page-container">
+
+  <aside class="sidebar-panel">
+    <div class="header">
+      <span class="logo">🤖 AI Interview</span>
+      <span class="sub-text">Voice Assistant</span>
+    </div>
+
+    <div class="section-block progress-section">
+      <label>Progress</label>
+      <div class="progress-indicator">3/10</div>
+      <div class="progress-bar-shell">
+        <div class="progress-bar-fill" style="width: 30%;"></div>
+      </div>
+    </div>
+
+    <div class="section-block settings-section">
+      <h3>Settings</h3>
+      <div class="setting-item">
+        <label for="speech-rec">Speech Recognition</label>
+        <input type="checkbox" id="speech-rec" checked>
+      </div>
+      <div class="setting-item">
+        <label for="show-text">Show Speech Text</label>
+        <input type="checkbox" id="show-text">
+      </div>
+      <div class="setting-item">
+        <label for="helper-tools">Helper Tools</label>
+        <input type="checkbox" id="helper-tools">
+      </div>
+    </div>
+
+    <div class="section-block history-section">
+      <h3>Question History</h3>
+      <div class="history-item completed">
+        <span class="status-icon">✓</span>
+        <span class="text">Q1: Tell me about yourself</span>
+      </div>
+      <div class="history-item completed">
+        <span class="status-icon">✓</span>
+        <span class="text">Q2: Your experience with React</span>
+      </div>
+      <div class="history-item current">
+        <span class="status-icon">›</span>
+        <span class="text">Q3: Implement a binary search</span>
+        <span class="current-label">Current</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content-panel">
+    <header class="main-header">
+      <h2>Technical Interview</h2>
+      <p>Senior Frontend Developer Position</p>
+      <span class="time-limit">⏱ 25-30</span>
+      <button class="btn btn-end-interview">🛑 End Interview</button>
+    </header>
+
+    <section class="ai-question-block">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-speech-bubble">
+        <p class="ai-status">AI Interviewer <span class="speaking-indicator">🗣 Speaking...</span></p>
+        <p class="question-text">Great! Now let's move to a coding challenge. Can you implement a binary search
+          algorithm in JavaScript? Please write a function that takes a sorted array and a target value, then returns
+          the index of the target or -1 if not found.</p>
+      </div>
+    </section>
+
+    <section class="user-response-section">
+      <h3>Your Response</h3>
+
+      <div class="response-editor-container">
+
+        <div *ngIf="activeInputMode() === 'code'" class="code-editor-wrapper">
+          <div class="code-line-numbers">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+            <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+          </div>
+          <textarea class="code-input" placeholder="Write your code here (e.g., JavaScript for binary search)..."
+            [value]="codeEditorContent()" (input)="onCodeEditorChange($event)"></textarea>
+        </div>
+
+        <div *ngIf="activeInputMode() === 'speech'" class="response-editor-placeholder speech-active">
+          <p class="transcription-text">{{ userTranscript() }}</p>
+          <div *ngIf="isRecordingActive" class="listening-animation">... Speaking ...</div>
+        </div>
+      </div>
+
+
+      <div class="response-controls">
+        <div class="control-group left">
+          <button class="btn btn-mic" (click)="toggleRecording()"
+            [disabled]="aiSpeaking() || activeInputMode() !== 'speech'"
+            [class.active]="isRecordingActive && activeInputMode() === 'speech'">
+
+            {{ isRecordingActive ? '⏸' : '🎤' }}
+          </button>
+
+          <button class="btn btn-text-mode" (click)="setInputMode('text')"
+            [class.active]="activeInputMode() === 'text'">
+
+            ⌨️
+          </button>
+
+          <button class="btn btn-code-mode" (click)="setInputMode('code')"
+            [class.active]="activeInputMode() === 'code'">
+
+            &lt;/&gt;
+          </button>
+        </div>
+
+        <div class="control-group center">
+          <button class="btn btn-skip">▶️ Pass / Skip</button>
+        </div>
+
+        <div class="control-group right">
+          <button class="btn btn-submit" (click)="submitAnswer()">
+            <span class="icon">✈️</span> Submit Answer
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

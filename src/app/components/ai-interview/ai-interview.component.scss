@@ -1,0 +1,280 @@
+/* --- Global Reset and Main Layout --- */
+.interview-page-container {
+    display: flex;
+    /* Sets the main layout to have the sidebar and main content side-by-side */
+    min-height: 100vh;
+    background-color: #f4f7f9; /* Light background for the main area */
+    border: 2px solid #5d5cff; /* Main purple border around the app */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* --- Sidebar Styling --- */
+.sidebar-panel {
+    width: 250px;
+    background-color: #ffffff; /* White background for the sidebar */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-panel .header {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.sidebar-panel .logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #5d5cff;
+}
+
+/* Progress Section */
+.progress-section label {
+    font-weight: 600;
+}
+.progress-bar-shell {
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+.progress-bar-fill {
+    height: 100%;
+    background-color: #5d5cff;
+    border-radius: 4px;
+}
+
+/* Settings Section */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* History Section */
+.history-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: #333;
+    cursor: pointer;
+}
+.history-item .status-icon {
+    width: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+.history-item.completed {
+    color: #666;
+}
+.history-item.completed .status-icon {
+    color: green;
+}
+.history-item.current {
+    background-color: #f0f0ff; /* Light purple highlight */
+    color: #5d5cff;
+    font-weight: 600;
+    padding-left: 5px;
+}
+.history-item.current .status-icon {
+    color: #5d5cff;
+}
+.current-label {
+    margin-left: auto;
+    font-size: 0.7rem;
+    background-color: #ddd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #333;
+}
+
+/* --- Main Content Styling --- */
+.main-content-panel {
+    flex-grow: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Main Header */
+.main-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.main-header h2 {
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+.main-header p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-right: auto;
+}
+.main-header .time-limit {
+    font-size: 0.9rem;
+    color: #e91e63; /* Red/pink color for time */
+    margin-right: 15px;
+}
+.btn-end-interview {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* AI Question Block */
+.ai-question-block {
+    display: flex;
+    gap: 15px;
+}
+.ai-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #5d5cff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.ai-speech-bubble {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    flex-grow: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.ai-status {
+    font-weight: 600;
+    color: #5d5cff;
+    margin-bottom: 10px;
+}
+.speaking-indicator {
+    color: green;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+/* User Response Section */
+.user-response-section h3 {
+    margin-bottom: 10px;
+}
+
+.response-editor-placeholder {
+    min-height: 200px;
+    background-color: #333;
+    color: #eee;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* Response Controls */
+.response-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.btn {
+    padding: 10px 18px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.btn-mic, .btn-code {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1.5rem;
+    border-color: #eee;
+}
+
+.btn-mic {
+    background-color: #e91e63; /* Red color for active mic */
+    color: white;
+    border: none;
+}
+
+.btn-submit {
+    background-color: #5d5cff;
+    color: white;
+    border: none;
+}
+.btn-submit .icon {
+    margin-right: 5px;
+}
+
+/* --- Code Editor Styling --- */
+
+.code-editor-wrapper {
+    /* Mimics the placeholder block structure */
+    min-height: 250px;
+    background-color: #282c34; /* Dark background (VS Code theme) */
+    color: #abb2bf; /* Light text color */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    overflow: hidden; /* Contains line numbers and text area */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.code-line-numbers {
+    width: 40px;
+    padding: 15px 0 15px 10px;
+    background-color: #21252b; /* Slightly darker background for numbers */
+    color: #636d83; /* Faded number color */
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1.5; /* Matches textarea line-height */
+    text-align: right;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-input {
+    /* Styles applied to the actual textarea */
+    flex-grow: 1;
+    padding: 15px;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: #abb2bf;
+    resize: none;
+    font-family: 'Consolas', 'Monaco', monospace; /* Monospace font */
+    font-size: 1rem;
+    line-height: 1.5; /* Important for alignment with line numbers */
+    outline: none;
+    caret-color: #5d5cff; /* Cursor color */
+    white-space: pre; /* Essential for code formatting */
+    overflow-y: auto;
+}
+
+/* Ensure the transcription area styling is not affected */
+.response-editor-placeholder.speech-active {
+    min-height: 250px; /* Keep height consistent */
+    background-color: #f0f0f0;
+    /* ... other styles ... */
+}
