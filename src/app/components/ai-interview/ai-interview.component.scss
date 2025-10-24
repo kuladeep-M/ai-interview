@@ -1,3 +1,16 @@
+.btn-mic, .btn-text-mode, .btn-code-mode {
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.btn-mic svg, .btn-text-mode svg, .btn-code-mode svg {
+    display: block;
+    margin: auto;
+}
 .vertical-controls {
     align-items: center;
     display: flex;
@@ -42,22 +55,33 @@
     box-shadow: 0 4px 16px rgba(236, 64, 122, 0.18);
 }
 .btn-text-mode, .btn-code-mode {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 12px;
+    border-radius: 50%;
     width: 56px;
     height: 56px;
-    margin-left: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border 0.2s;
+    margin-left: 12px;
+    padding: 0;
+    border: none;
 }
-.btn-text-mode.active, .btn-code-mode.active {
-    border: 2px solid #b39ddb;
+.btn-text-mode.active {
+    box-shadow: 0 0 0 4px rgba(126, 87, 194, 0.12), 0 4px 16px rgba(126, 87, 194, 0.18);
+}
+.btn-text-mode:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5e35b1 60%, #b39ddb 100%);
+    box-shadow: 0 6px 20px rgba(126, 87, 194, 0.22), 0 2px 8px rgba(44, 62, 80, 0.10);
+}
+.btn-code-mode {
+    background: linear-gradient(135deg, #0097a7 60%, #00bcd4 100%);
+    box-shadow: 0 4px 16px rgba(0, 151, 167, 0.18), 0 2px 8px rgba(44, 62, 80, 0.10);
 }
 .btn-code-mode.active {
-    border-color: #80deea;
+    box-shadow: 0 0 0 4px rgba(0, 151, 167, 0.12), 0 4px 16px rgba(0, 151, 167, 0.18);
+}
+.btn-code-mode:hover:not(:disabled) {
+    background: linear-gradient(135deg, #00838f 60%, #00bcd4 100%);
+    box-shadow: 0 6px 20px rgba(0, 151, 167, 0.22), 0 2px 8px rgba(44, 62, 80, 0.10);
 }
 .btn-skip {
     background: #fff;
