@@ -2,8 +2,8 @@
 .btn-text-mode,
 .btn-code-mode {
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,11 +62,24 @@
     justify-content: center;
     box-shadow: 0 2px 8px rgba(236, 64, 122, 0.12);
     transition: box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .btn-mic.active {
     box-shadow: 0 4px 16px rgba(236, 64, 122, 0.18);
+    box-shadow: 0 0 12px 2px #d40754;
 }
+
+.btn-text-mode.active {
+    border: 4px solid #5d2eb3;
+    box-shadow: 0 0 18px 5px hwb(261 5% 36% / 0.774);
+}
+
+.btn-code.active {
+    border: 4px solid #0991a0;
+    box-shadow: 0 0 18px 5px #047e8cb8;
+}
+
 
 .btn-code {
     background-color: #0097A7;
@@ -492,17 +505,24 @@
 }
 
 .response-editor-placeholder {
-    min-height: 200px;
-    background-color: #333;
-    color: #eee;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-family: monospace;
+    min-height: 280px;
+    max-height: 400px;
+    width: 100%;
+    border-color: #9d6acd;
+    background: #b39ddb30;
+    color: #222;
+    border-radius: 14px;
+    margin-bottom: 28px;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 22px 28px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    box-shadow: 0 4px 16px rgba(93, 92, 255, 0.10);
 }
 
 .user-response-section {
@@ -542,7 +562,7 @@
 }
 
 .btn-mic {
-    background-color: #e91e63;
+    background-color: #d40754;
     /* Red color for active mic */
     color: white;
     border: none;

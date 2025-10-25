@@ -70,19 +70,8 @@
       <div class="ai-speech-bubble">
         <p class="ai-status">
           <span style="color: #5d5cff; font-weight: 600;">AI Interviewer</span>
-          <span *ngIf="aiSpeaking() && !showAISpeakingText() && !showUserSpeakingText()"
+          <span *ngIf="aiSpeaking() && !showAISpeakingText() && !isRecordingActive"
             class="ai-top-speaking-indicator" style="margin-left: 12px;">
-            <svg width="22" height="22" viewBox="0 0 22 22" style="vertical-align: middle; margin-right: 4px;">
-              <circle cx="11" cy="11" r="10" fill="#388e3c" />
-              <path d="M11 6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2v2" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                fill="none" />
-              <animateTransform attributeName="transform" type="scale" values="1;1.2;1" dur="1s"
-                repeatCount="indefinite" />
-            </svg>
-            <span style="color: #388e3c; font-weight: 600; font-size: 1.1em;">Speaking...</span>
-          </span>
-          <span *ngIf="aiSpeaking() && (showAISpeakingText() || showUserSpeakingText())" class="ai-speaking-indicator"
-            style="margin-left: 12px;">
             <svg width="22" height="22" viewBox="0 0 22 22" style="vertical-align: middle; margin-right: 4px;">
               <circle cx="11" cy="11" r="10" fill="#388e3c" />
               <path d="M11 6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2v2" stroke="#fff" stroke-width="2" stroke-linecap="round"
@@ -131,7 +120,7 @@
               </div>
             </div>
             }
-            <div *ngIf="isRecordingActive" class="chat-bubble user live minimal-bubble"
+            <div *ngIf="liveTranscript()" class="chat-bubble user live minimal-bubble"
               (ngAfterViewInit)="chatWindow.scrollTop = chatWindow.scrollHeight"
               (ngOnChanges)="chatWindow.scrollTop = chatWindow.scrollHeight">
               <div class="avatar minimal-avatar">
@@ -141,11 +130,9 @@
                     dominant-baseline="middle">K</text>
                 </svg>
               </div>
-              <div class="bubble-content minimal-content">
-                <span *ngIf="showUserSpeakingText()" class="chat-text live-typing minimal-text">{{ liveTranscript()
-                  }}</span>
-                <span *ngIf="showUserSpeakingText()" class="timestamp minimal-timestamp">speaking...</span>
-                <span class="input-indicator">
+              <div  class="bubble-content minimal-content">
+                <span class="chat-text live-typing minimal-text">{{ liveTranscript() }}</span>
+                <span  class="input-indicator">
                   <span class="pulse-dot"></span> Listening for input...
                 </span>
               </div>
@@ -153,7 +140,7 @@
           </div>
         </ng-container>
         <ng-template #speakingIndicator>
-          <div *ngIf="showUserSpeakingText() && (liveTranscript() || userSpeakingIndicator())"
+          <div *ngIf="showUserSpeakingText() && !isRecordingActive && (liveTranscript() || userSpeakingIndicator())"
             class="user-speaking-indicator">
             🧑 User is speaking...
           </div>
@@ -175,7 +162,7 @@
           <textarea class="code-input" placeholder="Write your code here (e.g., JavaScript for binary search)..."
             [value]="codeEditorContent()" (input)="onCodeEditorChange($event)"></textarea>
         </div>
-        <textarea *ngIf="activeInputMode() === 'text'" placeholder="Type your text response here..."></textarea>
+  <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder" placeholder="Type your text response here..."></textarea>
       </div>
 
 
