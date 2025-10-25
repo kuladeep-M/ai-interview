@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: NGX_MONACO_EDITOR_CONFIG,
       useValue: {
-        baseUrl: 'assets/monaco/min',
+        baseUrl: 'assets/monaco/min/vs',
         defaultOptions: { scrollBeyondLastLine: false },
         onMonacoLoad: () => {}
       }
