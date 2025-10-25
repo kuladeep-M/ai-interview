@@ -194,6 +194,7 @@
                 <rect x="12" y="24" width="8" height="2" rx="1" fill="#fff" />
               </svg>
             </span>
+            <span *ngIf="activeInputMode() === 'speech'" class="icon-tooltip">Mic On</span>
           </button>
 
           <!-- Keyboard Button -->
@@ -211,6 +212,7 @@
                 <rect x="12" y="18" width="8" height="2" rx="1" fill="#7E57C2" />
               </svg>
             </span>
+            <span *ngIf="activeInputMode() === 'text'" class="icon-tooltip">Text Mode On</span>
           </button>
 
           <!-- Code Button -->
@@ -225,6 +227,7 @@
                 <rect x="18" y="17" width="7" height="2.5" rx="1" fill="#fff" />
               </svg>
             </span>
+            <span *ngIf="activeInputMode() === 'code'" class="icon-tooltip">Code Mode On</span>
           </button>
         </div>
 

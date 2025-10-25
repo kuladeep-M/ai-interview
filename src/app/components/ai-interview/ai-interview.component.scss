@@ -1,3 +1,21 @@
+// Tooltip for active icons
+.icon-tooltip {
+    position: absolute;
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #333;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+    z-index: 10;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.95;
+}
 .btn-mic,
 .btn-text-mode,
 .btn-code-mode {
@@ -353,8 +371,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 48px;
-    margin-top: 32px;
+    margin-top: 10px;
 
     .control-group {
         display: flex;
