@@ -1,19 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-export interface Interview {
-  name: string;
-  role: string;
-  score: number;
-  time: string;
-  avatarClass: string;
-}
+
 
 export interface InterviewDetail {
+  id: number;
   name: string;
   role: string;
   interviewTime: string;
-  fitScore: number;
+  score: number;
   duration: string;
   questionsAnswered: string;
   confidenceLevel: string;
@@ -26,16 +21,6 @@ export interface InterviewDetail {
   avatarClass: string;
 }
 
-function getRandomColor(name: string): string {
-  // Generate a pastel color based on the name
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h = hash % 360;
-  return `hsl(${h}, 70%, 80%)`;
-}
-
 @Component({
   selector: 'app-hr-dashboard',
   templateUrl: './hr-dashboard.component.html',
@@ -43,54 +28,101 @@ function getRandomColor(name: string): string {
   standalone: true,
   imports: [CommonModule]
 })
-export class HrDashboardComponent {
-  interviews: Interview[] = [
-    { name: 'Sarah Chen', role: 'Senior Frontend Developer', score: 92, time: '2:30 PM Today', avatarClass: 'avatar-sarah' },
-    { name: 'Michael Torres', role: 'Backend Engineer', score: 76, time: '1:00 PM Today', avatarClass: 'avatar-michael' },
-    { name: 'Emma Rodriguez', role: 'UX Designer', score: 88, time: '11:30 AM Today', avatarClass: 'avatar-emma' },
-    { name: 'David Kim', role: 'DevOps Engineer', score: 54, time: '10:00 AM Today', avatarClass: 'avatar-david' },
-    { name: 'Lisa Wang', role: 'Product Manager', score: 91, time: 'Yesterday 4:00 PM', avatarClass: 'avatar-lisa' }
-  ];
-
-  selectedInterview: InterviewDetail = {
-    name: 'Sarah Chen',
-    role: 'Senior Frontend Developer',
-    interviewTime: 'Oct 23, 2024 at 2:30 PM',
-    fitScore: 92,
-    duration: '45m',
-    questionsAnswered: '12/15',
-    confidenceLevel: 'High',
-    technicalScore: '89%',
-    avatarClass: 'avatar-sarah',
-    qa: [
-      {
-        question: 'Explain the difference between React hooks and class components.',
-        answer: 'React hooks allow us to use state and lifecycle methods in functional components, making them more concise and easier to test. Class components require more boilerplate code but were the traditional way before hooks were introduced in React 16.8.',
-        aiFeedback: 'Excellent answer demonstrating clear understanding of React concepts. Shows practical knowledge of modern React development patterns.'
-      },
-      {
-        question: 'How would you optimize a React application\'s performance?',
-        answer: 'I would use React.memo for component memoization, implement code splitting with lazy loading, optimize bundle size, use useCallback and useMemo hooks appropriately, and implement virtual scrolling for large lists.'
-      }
-    ]
-  };
-
-  getInterviewDetail(interview: Interview): InterviewDetail {
-    // For demo, only Sarah Chen has full details; others show basic info
-    if (interview.name === 'Sarah Chen') {
-      return this.selectedInterview;
+export class HrDashboardComponent implements OnInit {
+  interviews :InterviewDetail[] = [
+    {
+      id: 1,
+      name: 'Sarah Chen',
+      role: 'Senior Frontend Developer',
+      interviewTime: 'Oct 23, 2024 at 2:30 PM',
+      score: 92,
+      duration: '45m',
+      questionsAnswered: '12/15',
+      confidenceLevel: 'High',
+      technicalScore: '89%',
+      avatarClass: 'avatar-sarah',
+      qa: [
+        {question: 'Tell me about yourself.', answer: 'I am a frontend developer with 5 years of experience...', aiFeedback: 'Good introduction, but could include more about specific skills.'},
+        {question: 'Describe a challenging project you worked on.', answer: 'I led a migration from AngularJS to Angular 12...', aiFeedback: 'Strong leadership, mention technical hurdles.'},
+        {question: 'How do you ensure code quality?', answer: 'I use unit tests, code reviews, and linters...', aiFeedback: 'Good practices, could mention CI/CD.'}
+      ]
+    },
+    {
+      id: 2,
+      name: 'Michael Torres',
+      role: 'Backend Engineer',
+      interviewTime: 'Oct 23, 2024 at 1:00 PM',
+      score: 76,
+      duration: '40m',
+      questionsAnswered: '10/15',
+      confidenceLevel: 'Medium',
+      technicalScore: '75%',
+      avatarClass: 'avatar-michael',
+      qa: [
+        {question: 'What is RESTful API?', answer: 'RESTful API is an architectural style for designing networked applications...', aiFeedback: 'Clear explanation, but could mention examples.'},
+        {question: 'How do you handle database migrations?', answer: 'I use tools like Flyway and Liquibase...', aiFeedback: 'Good, mention rollback strategies.'},
+        {question: 'Explain error handling in Node.js.', answer: 'I use try-catch blocks and error middleware...', aiFeedback: 'Solid, could discuss logging.'}
+      ]
+    },
+    {
+      id: 3,
+      name: 'Emma Rodriguez',
+      role: 'UX Designer',
+      interviewTime: 'Oct 23, 2024 at 11:30 AM',
+      score: 88,
+      duration: '50m',
+      questionsAnswered: '14/15',
+      confidenceLevel: 'High',
+      technicalScore: '85%',
+      avatarClass: 'avatar-emma',
+      qa: [
+        {question: 'How do you approach user research?', answer: 'I start by identifying target users and conducting interviews...', aiFeedback: 'Comprehensive approach, well done.'},
+        {question: 'Describe your design process.', answer: 'I follow a user-centered design process...', aiFeedback: 'Clear steps, could mention prototyping.'},
+        {question: 'How do you handle feedback?', answer: 'I collect feedback through surveys and usability tests...', aiFeedback: 'Good, mention iteration.'}
+      ]
+    },
+    {
+      id: 4,
+      name: 'David Kim',
+      role: 'DevOps Engineer',
+      interviewTime: 'Oct 23, 2024 at 10:00 AM',
+      score: 54,
+      duration: '30m',
+      questionsAnswered: '8/15',
+      confidenceLevel: 'Low',
+      technicalScore: '60%',
+      avatarClass: 'avatar-david',
+      qa: [
+        {question: 'Explain CI/CD.', answer: 'CI/CD stands for Continuous Integration and Continuous Deployment...', aiFeedback: 'Basic understanding, could elaborate more.'},
+        {question: 'How do you monitor production systems?', answer: 'I use Prometheus and Grafana for monitoring...', aiFeedback: 'Good, could mention alerting.'},
+        {question: 'Describe your experience with Docker.', answer: 'I build and deploy containers for microservices...', aiFeedback: 'Solid, could discuss orchestration.'}
+      ]
     }
+  ]
+
+  selectedInterview: InterviewDetail | null = null;
+
+  ngOnInit() {
+    // Set default selected interview
+    this.selectedInterview = this.getInterviewDetail(this.interviews[0].id);
+  }
+
+  getInterviewDetail(id: number): InterviewDetail | null {
+    const interview = this.interviews.find(interview => interview.id === id);
+    if (!interview) return null;
+
     return {
+      id: interview.id,
       name: interview.name,
       role: interview.role,
-      interviewTime: interview.time,
-      fitScore: interview.score,
-      duration: '--',
-      questionsAnswered: '--',
-      confidenceLevel: '--',
-      technicalScore: '--',
+      interviewTime: interview.interviewTime,
+      score: interview.score,
+      duration: interview.duration,
+      questionsAnswered: interview.questionsAnswered,
+      confidenceLevel: interview.confidenceLevel,
+      technicalScore: interview.technicalScore,
       avatarClass: interview.avatarClass,
-      qa: []
+      qa: interview.qa
     };
   }
 
@@ -109,4 +141,14 @@ export class HrDashboardComponent {
       'border-radius': '50%'
     };
   }
+}
+
+function getRandomColor(name: string): string {
+  // Generate a pastel color based on the name
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = hash % 360;
+  return `hsl(${h}, 70%, 80%)`;
 }

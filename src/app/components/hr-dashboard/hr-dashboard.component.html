@@ -16,7 +16,7 @@
       <h3>Recent Interviews</h3>
       <span class="subtitle">{{ interviews.length }} interviews today</span>
       <ul class="interview-list">
-        <li *ngFor="let interview of interviews; let i = index" class="interview-card" [class.selected]="interview.name === selectedInterview.name" (click)="selectedInterview = getInterviewDetail(interview)">
+        <li *ngFor="let interview of interviews; let i = index" class="interview-card" [class.selected]="selectedInterview && interview.name === selectedInterview.name" (click)="selectedInterview = getInterviewDetail(interview.id)">
           <div class="avatar" [ngStyle]="getAvatarStyle(interview.name)">{{ getInitial(interview.name) }}</div>
           <div class="details">
             <div class="name">{{ interview.name }}</div>
@@ -26,13 +26,13 @@
               'warning': interview.score >= 70 && interview.score < 85,
               'danger': interview.score < 70
             }">{{ interview.score }}%</div>
-            <div class="time">{{ interview.time }}</div>
+            <div class="time">{{ interview.interviewTime }}</div>
           </div>
         </li>
       </ul>
     </div>
 
-    <div class="interview-details">
+    <div class="interview-details" *ngIf="selectedInterview">
       <div class="profile-header">
         <div class="avatar large" [ngStyle]="getAvatarStyle(selectedInterview.name)" style="font-size:2rem;">{{ getInitial(selectedInterview.name) }}</div>
         <div class="profile-info">
@@ -42,7 +42,7 @@
         </div>
         <div class="fit-score">
           <span class="label">AI Fit Score</span>
-          <div class="score success">{{ selectedInterview.fitScore }}%</div>
+          <div class="score success">{{ selectedInterview.score }}%</div>
         </div>
       </div>
       <div class="stats-row">
