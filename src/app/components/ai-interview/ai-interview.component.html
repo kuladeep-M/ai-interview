@@ -130,12 +130,7 @@
                     dominant-baseline="middle">K</text>
                 </svg>
               </div>
-              <div  class="bubble-content minimal-content">
-                <span class="chat-text live-typing minimal-text">{{ liveTranscript() }}</span>
-                <span  class="input-indicator">
-                  <span class="pulse-dot"></span> Listening for input...
-                </span>
-              </div>
+             
             </div>
           </div>
         </ng-container>
@@ -231,8 +226,8 @@
           </button>
         </div>
 
-        <div class="control-group right">
-          <button class="btn btn-submit" (click)="submitAnswer()">
+        <div class="control-group right" >
+          <button class="btn btn-submit" *ngIf="activeInputMode() !== 'speech'" (click)="submitAnswer()">
             <span class="icon-submit">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <rect x="2" y="8" width="28" height="16" rx="8" fill="#5d5cff" />

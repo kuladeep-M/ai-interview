@@ -14,7 +14,14 @@
     z-index: 10;
     white-space: nowrap;
     pointer-events: none;
-    opacity: 0.95;
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+.btn-style:hover .icon-tooltip {
+    opacity: 1;
+    visibility: visible;
 }
 .btn-mic,
 .btn-text-mode,
@@ -75,6 +82,7 @@
     padding: 0;
     width: 56px;
     height: 56px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
