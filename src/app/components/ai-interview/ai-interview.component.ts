@@ -12,6 +12,9 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  // Timer state
+  public timerSeconds: WritableSignal<number> = signal(0);
+  private timerInterval: any = null;
   public helperTools: WritableSignal<boolean> = signal(false);
   public userName: string = 'Kuladeep';
   get userInitial(): string {
@@ -55,7 +58,16 @@ export class AiInterviewComponent implements OnInit {
   public codeEditorContent: WritableSignal<string> = signal('');
 
   ngOnInit(): void {
-    // TODO: Any initial subscriptions (e.g., to a greeting stream)
+    // Start timer when interview screen loads
+    this.timerSeconds.set(0);
+    this.timerInterval = setInterval(() => {
+      this.timerSeconds.update((s) => s + 1);
+    }, 1000);
+  }
+  get formattedTimer(): string {
+    const min = Math.floor(this.timerSeconds() / 60);
+    const sec = this.timerSeconds() % 60;
+    return `${min}:${sec.toString().padStart(2, '0')}`;
   }
 
   /**
@@ -278,5 +290,9 @@ export class AiInterviewComponent implements OnInit {
   ngOnDestroy(): void {
     this.stopRecording();
     // TODO: Unsubscribe from other service streams if needed
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
   }
 }

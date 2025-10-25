@@ -1,4 +1,6 @@
-.btn-mic, .btn-text-mode, .btn-code-mode {
+.btn-mic,
+.btn-text-mode,
+.btn-code-mode {
     border-radius: 50%;
     width: 56px;
     height: 56px;
@@ -7,38 +9,48 @@
     justify-content: center;
     padding: 0;
 }
-.btn-mic svg, .btn-text-mode svg, .btn-code-mode svg {
+
+.btn-mic svg,
+.btn-text-mode svg,
+.btn-code-mode svg {
     display: block;
     margin: auto;
 }
+
 .vertical-controls {
     align-items: center;
     display: flex;
     gap: 12px !important;
     margin-right: 32px;
 }
+
 // Beautiful icon styles for response controls
 .icon-mic svg {
     display: block;
     margin: auto;
 }
+
 .icon-text svg {
     display: block;
     margin: auto;
 }
+
 .icon-code svg {
     display: block;
     margin: auto;
 }
+
 .icon-skip svg {
     display: block;
     margin-right: 8px;
 }
+
 .icon-submit svg {
     display: block;
     margin-right: 8px;
 }
-.btn-mic {
+
+.btn-style {
     background: none;
     border: none;
     border-radius: 50%;
@@ -51,38 +63,21 @@
     box-shadow: 0 2px 8px rgba(236, 64, 122, 0.12);
     transition: box-shadow 0.2s;
 }
+
 .btn-mic.active {
     box-shadow: 0 4px 16px rgba(236, 64, 122, 0.18);
 }
-.btn-text-mode, .btn-code-mode {
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 12px;
-    padding: 0;
-    border: none;
+
+.btn-code {
+    background-color: #0097A7;
 }
-.btn-text-mode.active {
-    box-shadow: 0 0 0 4px rgba(126, 87, 194, 0.12), 0 4px 16px rgba(126, 87, 194, 0.18);
+
+.btn-text-mode {
+    height: 45px;
+    width: 45px;
+    background-color: #5928ad;
 }
-.btn-text-mode:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5e35b1 60%, #b39ddb 100%);
-    box-shadow: 0 6px 20px rgba(126, 87, 194, 0.22), 0 2px 8px rgba(44, 62, 80, 0.10);
-}
-.btn-code-mode {
-    background: linear-gradient(135deg, #0097a7 60%, #00bcd4 100%);
-    box-shadow: 0 4px 16px rgba(0, 151, 167, 0.18), 0 2px 8px rgba(44, 62, 80, 0.10);
-}
-.btn-code-mode.active {
-    box-shadow: 0 0 0 4px rgba(0, 151, 167, 0.12), 0 4px 16px rgba(0, 151, 167, 0.18);
-}
-.btn-code-mode:hover:not(:disabled) {
-    background: linear-gradient(135deg, #00838f 60%, #00bcd4 100%);
-    box-shadow: 0 6px 20px rgba(0, 151, 167, 0.22), 0 2px 8px rgba(44, 62, 80, 0.10);
-}
+
 .btn-skip {
     background: #fff;
     border: 1px solid #eee;
@@ -97,6 +92,7 @@
     margin: auto;
     transition: border 0.2s;
 }
+
 .btn-submit {
     background: #5d5cff;
     color: #fff;
@@ -112,9 +108,11 @@
     box-shadow: 0 2px 8px rgba(93, 92, 255, 0.12);
     transition: box-shadow 0.2s;
 }
+
 .btn-submit:hover {
     box-shadow: 0 4px 16px rgba(93, 92, 255, 0.18);
 }
+
 // AI speaking indicator styles
 .ai-speaking-indicator {
     display: flex;
@@ -123,6 +121,7 @@
     font-size: 0.95rem;
     color: #00C9A7;
 }
+
 .ai-pulse-dot {
     width: 8px;
     height: 8px;
@@ -131,15 +130,29 @@
     margin-right: 6px;
     animation: ai-pulse 1s infinite;
 }
+
 .ai-speaking-label {
     font-weight: 500;
     letter-spacing: 0.5px;
 }
+
 @keyframes ai-pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
+
 // Floating indicator bar for listening state when user speaking text is off
 .input-indicator-bar {
     position: fixed;
@@ -156,6 +169,7 @@
     align-items: center;
     z-index: 1000;
 }
+
 // Input indicator for live user speech
 .input-indicator {
     display: flex;
@@ -164,6 +178,7 @@
     color: #b39ddb;
     margin-top: 2px;
 }
+
 .pulse-dot {
     width: 8px;
     height: 8px;
@@ -172,11 +187,24 @@
     margin-right: 6px;
     animation: pulse 1s infinite;
 }
+
 @keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
+
 /* Minimal chat UI */
 .chat-window.minimal-chat {
     background: transparent;
@@ -187,6 +215,7 @@
     max-height: 180px;
     overflow-y: auto;
 }
+
 .minimal-bubble {
     border-radius: 10px;
     box-shadow: none;
@@ -199,16 +228,20 @@
     position: relative;
     font-size: 0.92rem;
 }
+
 .minimal-bubble.ai {
     align-self: flex-start;
 }
+
 .minimal-bubble.user {
     align-self: flex-end;
 }
+
 .minimal-bubble.live {
     border: 1px dashed #5d5cff;
     background: #e3e7ff;
 }
+
 .minimal-avatar {
     font-size: 1.2rem;
     width: 1.7rem;
@@ -221,33 +254,40 @@
     border-radius: 50%;
     margin-right: 0.3rem;
 }
+
 .minimal-content {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
 }
+
 .minimal-text {
     font-size: 0.92rem;
     word-break: break-word;
     color: #222;
 }
+
 .live-typing {
     font-style: italic;
     color: #4caf50;
     animation: blink 1s infinite;
 }
+
 .minimal-timestamp {
     font-size: 0.7rem;
     color: #888;
     align-self: flex-end;
 }
+
 /* --- Global Reset and Main Layout --- */
 .interview-page-container {
     display: flex;
     /* Sets the main layout to have the sidebar and main content side-by-side */
     min-height: 100vh;
-    background-color: #f4f7f9; /* Light background for the main area */
-    border: 2px solid #5d5cff; /* Main purple border around the app */
+    background-color: #f4f7f9;
+    /* Light background for the main area */
+    border: 2px solid #5d5cff;
+    /* Main purple border around the app */
     border-radius: 8px;
     overflow: hidden;
 }
@@ -255,7 +295,8 @@
 /* --- Sidebar Styling --- */
 .sidebar-panel {
     width: 250px;
-    background-color: #ffffff; /* White background for the sidebar */
+    background-color: #ffffff;
+    /* White background for the sidebar */
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     display: flex;
@@ -279,12 +320,14 @@
 .progress-section label {
     font-weight: 600;
 }
+
 .progress-bar-shell {
     height: 8px;
     background-color: #e0e0e0;
     border-radius: 4px;
     margin-top: 5px;
 }
+
 .progress-bar-fill {
     height: 100%;
     background-color: #5d5cff;
@@ -295,22 +338,26 @@
 .setting-item {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     gap: 48px;
     margin-top: 32px;
-.control-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-}
-.control-group.center {
-    justify-content: center;
-}
-.control-group.right {
-    justify-content: flex-end;
-}
+
+    .control-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .control-group.center {
+        justify-content: center;
+    }
+
+    .control-group.right {
+        justify-content: flex-end;
+    }
+
     margin-bottom: 10px;
 }
 
@@ -323,26 +370,33 @@
     color: #333;
     cursor: pointer;
 }
+
 .history-item .status-icon {
     width: 20px;
     font-weight: bold;
     text-align: center;
 }
+
 .history-item.completed {
     color: #666;
 }
+
 .history-item.completed .status-icon {
     color: green;
 }
+
 .history-item.current {
-    background-color: #f0f0ff; /* Light purple highlight */
+    background-color: #f0f0ff;
+    /* Light purple highlight */
     color: #5d5cff;
     font-weight: 600;
     padding-left: 5px;
 }
+
 .history-item.current .status-icon {
     color: #5d5cff;
 }
+
 .current-label {
     margin-left: auto;
     font-size: 0.7rem;
@@ -355,7 +409,7 @@
 /* --- Main Content Styling --- */
 .main-content-panel {
     flex-grow: 1;
-    padding: 30px;
+    padding: 5px 30px;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -368,26 +422,28 @@
     padding-bottom: 15px;
     border-bottom: 1px solid #e0e0e0;
 }
+
 .main-header h2 {
     font-size: 1.5rem;
     margin-right: 15px;
 }
+
 .main-header p {
     font-size: 0.9rem;
     color: #666;
     margin-right: auto;
 }
+
 .main-header .time-limit {
     font-size: 0.9rem;
-    color: #e91e63; /* Red/pink color for time */
+    color: #e91e63;
+    /* Red/pink color for time */
     margin-right: 15px;
+    font-weight: 800;
 }
+
 .btn-end-interview {
-    background-color: #e91e63;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
+    color: black;
     cursor: pointer;
 }
 
@@ -396,6 +452,7 @@
     display: flex;
     gap: 15px;
 }
+
 .ai-avatar {
     width: 40px;
     height: 40px;
@@ -407,6 +464,7 @@
     justify-content: center;
     font-size: 1.5rem;
 }
+
 .ai-speech-bubble {
     background-color: white;
     padding: 20px;
@@ -414,12 +472,14 @@
     flex-grow: 1;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+
 .ai-status {
     font-weight: 600;
     color: #5d5cff;
     margin-bottom: 10px;
     margin-top: 4px;
 }
+
 .speaking-indicator {
     color: green;
     font-weight: normal;
@@ -445,12 +505,22 @@
     font-size: 1.2rem;
 }
 
-/* Response Controls */
+.user-response-section {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .response-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    margin-top: 50px;
 }
+
 .btn {
     padding: 10px 18px;
     border-radius: 5px;
@@ -458,10 +528,11 @@
     background-color: white;
     cursor: pointer;
     font-weight: 600;
-    margin-right: 10px;
 }
 
-.btn-mic, .btn-code {
+
+.btn-mic,
+.btn-code {
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -471,7 +542,8 @@
 }
 
 .btn-mic {
-    background-color: #e91e63; /* Red color for active mic */
+    background-color: #e91e63;
+    /* Red color for active mic */
     color: white;
     border: none;
 }
@@ -481,6 +553,7 @@
     color: white;
     border: none;
 }
+
 .btn-submit .icon {
     margin-right: 5px;
 }
@@ -490,23 +563,29 @@
 .code-editor-wrapper {
     /* Mimics the placeholder block structure */
     min-height: 250px;
-    background-color: #282c34; /* Dark background (VS Code theme) */
-    color: #abb2bf; /* Light text color */
+    background-color: #282c34;
+    /* Dark background (VS Code theme) */
+    color: #abb2bf;
+    /* Light text color */
     border-radius: 8px;
     margin-bottom: 20px;
     display: flex;
-    overflow: hidden; /* Contains line numbers and text area */
+    overflow: hidden;
+    /* Contains line numbers and text area */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .code-line-numbers {
     width: 40px;
     padding: 15px 0 15px 10px;
-    background-color: #21252b; /* Slightly darker background for numbers */
-    color: #636d83; /* Faded number color */
+    background-color: #21252b;
+    /* Slightly darker background for numbers */
+    color: #636d83;
+    /* Faded number color */
     font-family: monospace;
     font-size: 1rem;
-    line-height: 1.5; /* Matches textarea line-height */
+    line-height: 1.5;
+    /* Matches textarea line-height */
     text-align: right;
     user-select: none;
     display: flex;
@@ -522,18 +601,23 @@
     background: transparent;
     color: #abb2bf;
     resize: none;
-    font-family: 'Consolas', 'Monaco', monospace; /* Monospace font */
+    font-family: 'Consolas', 'Monaco', monospace;
+    /* Monospace font */
     font-size: 1rem;
-    line-height: 1.5; /* Important for alignment with line numbers */
+    line-height: 1.5;
+    /* Important for alignment with line numbers */
     outline: none;
-    caret-color: #5d5cff; /* Cursor color */
-    white-space: pre; /* Essential for code formatting */
+    caret-color: #5d5cff;
+    /* Cursor color */
+    white-space: pre;
+    /* Essential for code formatting */
     overflow-y: auto;
 }
 
 /* Ensure the transcription area styling is not affected */
 .response-editor-placeholder.speech-active {
-    min-height: 250px; /* Keep height consistent */
+    min-height: 250px;
+    /* Keep height consistent */
     background-color: #f0f0f0;
     /* ... other styles ... */
 }
