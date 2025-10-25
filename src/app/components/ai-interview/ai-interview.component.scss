@@ -251,7 +251,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-height: 180px;
+    max-height: 210px;
     overflow-y: auto;
 }
 
@@ -530,8 +530,8 @@
 }
 
 .response-editor-placeholder {
-    min-height: 280px;
-    max-height: 400px;
+    min-height: 200px;
+    max-height: 200px;
     width: 100%;
     border-color: #9d6acd;
     background: #b39ddb30;
@@ -608,7 +608,6 @@
 .code-editor-wrapper {
     /* Mimics the placeholder block structure */
     min-height: 250px;
-    background-color: #282c34;
     /* Dark background (VS Code theme) */
     color: #abb2bf;
     /* Light text color */

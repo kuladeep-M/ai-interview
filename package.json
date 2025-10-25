@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -38,6 +38,7 @@
     "@ng-web-apis/speech": "^4.12.2",
     "gsap": "^3.13.0",
     "lucide-angular": "^0.546.0",
+    "ngx-monaco-editor-v2": "^20.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

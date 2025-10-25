@@ -141,14 +141,16 @@
             <div *ngIf="liveTranscript()" class="chat-bubble user live minimal-bubble"
               (ngAfterViewInit)="chatWindow.scrollTop = chatWindow.scrollHeight"
               (ngOnChanges)="chatWindow.scrollTop = chatWindow.scrollHeight">
-              <div class="avatar minimal-avatar">
+                <div class="avatar minimal-avatar">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="16" cy="20" r="14" fill="#6C63FF" />
                   <text x="16" y="22" text-anchor="middle" font-size="16" fill="#fff" font-family="Arial, sans-serif"
                     dominant-baseline="middle">K</text>
                 </svg>
               </div>
-             
+              <div class="bubble-content minimal-content">
+                <span class="chat-text minimal-text">{{ liveTranscript() }}</span>
+              </div>
             </div>
           </div>
         </ng-container>
@@ -165,15 +167,23 @@
 
       <div class="response-editor-container" *ngIf="activeInputMode() === 'text' || activeInputMode() === 'code'">
         <h3>Your Response</h3>
-
-        <div *ngIf="activeInputMode() === 'code'" class="code-editor-wrapper">
-          <div class="code-line-numbers">
-            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-            <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+        <div *ngIf="activeInputMode() === 'code'">
+          <div class="editor-toolbar" style="margin-bottom: 8px;">
+            <label for="language-select" style="margin-right: 8px; font-weight: 500;">Language:</label>
+            <select id="language-select" [(ngModel)]="selectedLanguage" (change)="onLanguageChange($event)" style="padding: 4px 8px; border-radius: 4px;">
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="csharp">C#</option>
+            </select>
           </div>
-          <textarea class="code-input" placeholder="Write your code here (e.g., JavaScript for binary search)..."
-            [value]="codeEditorContent()" (input)="onCodeEditorChange($event)"></textarea>
+          <div class="code-editor-wrapper">
+            <ngx-monaco-editor
+              [options]="codeEditorOptions"
+              [model]="{ value: codeEditorContent, language: selectedLanguage }"
+              (modelChange)="onCodeEditorChange($event)"
+              style="height:300px;width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(44,62,80,0.10);">
+            </ngx-monaco-editor>
+          </div>
         </div>
   <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder" placeholder="Type your text response here..."></textarea>
       </div>

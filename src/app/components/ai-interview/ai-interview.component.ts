@@ -3,17 +3,51 @@ import { Component, inject, OnInit, signal, WritableSignal, ChangeDetectorRef } 
 import { map, Subscription } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
 import { AIStreamService } from '../../services/ai-stream.service';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { FormsModule } from '@angular/forms';
 
 export type InputMode = 'speech' | 'text' | 'code';
 // ai-interview.component.ts
+
 @Component({
   selector: 'app-ai-interview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MonacoEditorModule, FormsModule],
   templateUrl: './ai-interview.component.html',
   styleUrls: ['./ai-interview.component.scss'],
+  // No providers needed for ngx-monaco-editor-v2
 })
 export class AiInterviewComponent implements OnInit {
+  public selectedLanguage: string = 'javascript';
+  onLanguageChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.selectedLanguage = select.value;
+    // Dynamically set Monaco editor language for suggestions
+    // This requires accessing the editor instance
+    if ((window as any).monaco && (window as any).monaco.editor) {
+      const model = (window as any).monaco.editor.getModels()[0];
+      if (model) {
+        (window as any).monaco.editor.setModelLanguage(model, this.selectedLanguage);
+      }
+    }
+    this.codeEditorOptions = {
+      ...this.codeEditorOptions,
+      language: this.selectedLanguage
+    };
+  }
+  public codeEditorOptions = {
+    theme: 'vs', // Use Monaco's default light theme
+    language: 'javascript',
+    automaticLayout: true,
+    minimap: { enabled: false },
+    lineNumbers: 'on',
+    suggestOnTriggerCharacters: true,
+    quickSuggestions: { other: true, comments: true, strings: true },
+    wordBasedSuggestions: true,
+    tabCompletion: 'on',
+    acceptSuggestionOnEnter: 'on',
+    snippetSuggestions: 'inline'
+  };
   public showSidebar: boolean = true;
 
   toggleSidebar(): void {
@@ -63,9 +97,8 @@ export class AiInterviewComponent implements OnInit {
 
   // Input Mode State
   public activeInputMode: WritableSignal<any> = signal('speech');
-  public codeEditorContent: WritableSignal<string> = signal('');
-
-  ngOnInit(): void {
+  public codeEditorContent = "// Sample JavaScript function\nfunction greet(name) {\n  return 'Hello, ' + name + '!';\n}\n\ngreet('World');";
+   ngOnInit(): void {
     // Start timer when interview screen loads
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
@@ -102,7 +135,6 @@ export class AiInterviewComponent implements OnInit {
       this.startRecording();
     }
   }
-
   startRecording(): void {
     // Stop AI speaking immediately when user starts speaking
     this.aiSpeaking.set(false);
@@ -250,11 +282,16 @@ export class AiInterviewComponent implements OnInit {
   }
 
   /**
-   * Handles changes in the code editor textarea.
+   * Handles changes in the code editor (Monaco).
+   * Accepts either a string or NgxEditorModel.
    */
-  onCodeEditorChange(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    this.codeEditorContent.set(textarea.value);
+  onCodeEditorChange(ev: any): void {
+    const value = ev.target ? ev.target.value : ev.value; 
+    if (typeof value === 'string') {
+      this.codeEditorContent = value;
+    } else if (value && typeof value.value === 'string') {
+      this.codeEditorContent = value.value;
+    }
   }
   setInputMode(mode: InputMode): void {
     if (this.activeInputMode() === mode) {
@@ -296,7 +333,7 @@ export class AiInterviewComponent implements OnInit {
    */
   submitAnswer(): void {
     const response =
-      this.activeInputMode() === 'speech' ? this.userTranscript() : this.codeEditorContent();
+      this.activeInputMode() === 'speech' ? this.userTranscript() : this.codeEditorContent;
     // Send user response to AI backend via WebSocket
     this.aiStreamService.sendUserMessage(response);
     console.log(`SUBMITTED RESPONSE (Mode: ${this.activeInputMode()}): ${response}`);
