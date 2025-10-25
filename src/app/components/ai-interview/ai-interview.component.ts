@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, WritableSignal, ChangeDetectorRef } from '@angular/core';
 import { map, Subscription } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
+import { AIStreamService } from '../../services/ai-stream.service';
+
 export type InputMode = 'speech' | 'text' | 'code';
 // ai-interview.component.ts
 @Component({
@@ -12,6 +14,11 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  public showSidebar: boolean = true;
+
+  toggleSidebar(): void {
+    this.showSidebar = !this.showSidebar;
+  }
   // Timer state
   public timerSeconds: WritableSignal<number> = signal(0);
   private timerInterval: any = null;
@@ -23,7 +30,6 @@ export class AiInterviewComponent implements OnInit {
   public userSpeakingIndicator: WritableSignal<boolean> = signal(false);
   public showAISpeakingText: WritableSignal<boolean> = signal(true);
   public showUserSpeakingText: WritableSignal<boolean> = signal(true);
-  // ...existing code...
   // Place this method inside the class, after properties and before lifecycle hooks or other methods
   toggleShowAISpeakingText(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -37,14 +43,16 @@ export class AiInterviewComponent implements OnInit {
   public liveTranscript: WritableSignal<string> = signal('');
   // Removed ChangeDetectorRef injection; signals now handle reactivity
   public draftTranscript: string = '';
-  private draftConfidence: number = 0;
   // Removed debounce feature
   // Removed draftTranscript feature
   public conversationHistory: { speaker: 'user' | 'ai', text: string }[] = [];
   private finalTranscriptSegments: string[] = [];
   private lastTranscriptChunk: string = '';
   private speechService = inject(VoiceService);
+  private aiStreamService = inject(AIStreamService);
+  private wsUrl = 'ws://localhost:8080'; // Change to your AI backend WebSocket URL
   private recordSubscription: Subscription | null = null;
+  private aiStreamSubscription: Subscription | null = null;
 
   // UI State Signals
   public userTranscript: WritableSignal<string> = signal('Press mic to start speaking.');
@@ -63,6 +71,13 @@ export class AiInterviewComponent implements OnInit {
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update((s) => s + 1);
     }, 1000);
+
+    // Connect to AI WebSocket stream
+    this.aiStreamService.connect(this.wsUrl);
+    this.aiStreamSubscription = this.aiStreamService.response$.subscribe((aiChunk: string) => {
+      this.conversationHistory.push({ speaker: 'ai', text: aiChunk });
+      this.speechService.speak(aiChunk);
+    });
   }
   get formattedTimer(): string {
     const min = Math.floor(this.timerSeconds() / 60);
@@ -282,7 +297,8 @@ export class AiInterviewComponent implements OnInit {
   submitAnswer(): void {
     const response =
       this.activeInputMode() === 'speech' ? this.userTranscript() : this.codeEditorContent();
-
+    // Send user response to AI backend via WebSocket
+    this.aiStreamService.sendUserMessage(response);
     console.log(`SUBMITTED RESPONSE (Mode: ${this.activeInputMode()}): ${response}`);
     // TODO: Send response to backend for evaluation
   }
@@ -293,6 +309,11 @@ export class AiInterviewComponent implements OnInit {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
+    }
+    this.aiStreamService.disconnect();
+    if (this.aiStreamSubscription) {
+      this.aiStreamSubscription.unsubscribe();
+      this.aiStreamSubscription = null;
     }
   }
 }

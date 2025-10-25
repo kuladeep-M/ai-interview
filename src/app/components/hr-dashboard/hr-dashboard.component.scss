@@ -1,0 +1,224 @@
+.hr-dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.sidebar {
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #ececec;
+  padding: 32px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.sidebar h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #222;
+  margin-left: 32px;
+  margin-bottom: 18px;
+}
+.sidebar nav ul {
+  list-style: none;
+  padding: 0 0 0 32px;
+  margin: 0;
+}
+.sidebar nav li {
+  font-size: 1.08rem;
+  color: #444;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.sidebar nav li.active {
+  color: #5d5cff;
+  font-weight: 600;
+}
+
+.main-panel {
+  flex: 1;
+  display: flex;
+  gap: 32px;
+  padding: 32px 40px;
+}
+.recent-interviews {
+  width: 320px;
+}
+.recent-interviews h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.recent-interviews .subtitle {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 18px;
+  display: block;
+}
+.interview-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.interview-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+  display: flex;
+  padding: 12px 18px;
+  gap: 16px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.interview-card.selected {
+  border-color: #5d5cff;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ececec;
+  margin-top: 5px;
+  margin-right: 8px;
+}
+.avatar.large {
+  width: 64px;
+  height: 64px;
+}
+.avatar-sarah { background: url('/assets/sarah.png') center/cover no-repeat; }
+.avatar-michael { background: url('/assets/michael.png') center/cover no-repeat; }
+.avatar-emma { background: url('/assets/emma.png') center/cover no-repeat; }
+.avatar-david { background: url('/assets/david.png') center/cover no-repeat; }
+.avatar-lisa { background: url('/assets/lisa.png') center/cover no-repeat; }
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.name {
+  font-weight: 600;
+  font-size: 1.08rem;
+}
+.role {
+  font-size: 0.98rem;
+  color: #666;
+}
+.score {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.score.success { color: #2ecc71; }
+.score.warning { color: #fbc02d; }
+.score.danger { color: #e74c3c; }
+.time {
+  font-size: 0.92rem;
+  color: #888;
+}
+.interview-details {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.profile-info .name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.profile-info .role {
+  font-size: 1.05rem;
+  color: #666;
+}
+.profile-info .meta {
+  font-size: 0.92rem;
+  color: #888;
+}
+.fit-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.fit-score .label {
+  font-size: 0.85rem;
+  color: #888;
+}
+.fit-score .score {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.stats-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 8px;
+}
+.stat {
+  background: #f4f7fa;
+  border-radius: 8px;
+  padding: 12px 24px;
+  text-align: center;
+  min-width: 110px;
+}
+.stat span {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #5d5cff;
+}
+.stat div {
+  font-size: 0.92rem;
+  color: #888;
+}
+.qa-section {
+  margin-top: 18px;
+}
+.qa-section h4 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.qa-block {
+  background: #f8f8ff;
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.question {
+  font-weight: 600;
+  color: #5d5cff;
+  margin-bottom: 6px;
+}
+.answer {
+  font-size: 0.98rem;
+  color: #222;
+  margin-bottom: 6px;
+}
+.ai-feedback {
+  font-size: 0.95rem;
+  color: #2ecc71;
+  font-weight: 600;
+}

@@ -1,0 +1,64 @@
+<div class="hr-dashboard-container">
+  <aside class="sidebar">
+    <h2>HR Dashboard</h2>
+    <nav>
+      <ul>
+        <li class="active"><span class="icon-analytics"></span> Interview Analytics</li>
+        <li><span class="icon-candidates"></span> Candidates</li>
+        <li><span class="icon-positions"></span> Positions</li>
+        <li><span class="icon-settings"></span> Settings</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <section class="main-panel">
+    <div class="recent-interviews">
+      <h3>Recent Interviews</h3>
+      <span class="subtitle">{{ interviews.length }} interviews today</span>
+      <ul class="interview-list">
+        <li *ngFor="let interview of interviews; let i = index" class="interview-card" [class.selected]="interview.name === selectedInterview.name" (click)="selectedInterview = getInterviewDetail(interview)">
+          <div class="avatar" [ngStyle]="getAvatarStyle(interview.name)">{{ getInitial(interview.name) }}</div>
+          <div class="details">
+            <div class="name">{{ interview.name }}</div>
+            <div class="role">{{ interview.role }}</div>
+            <div class="score" [ngClass]="{
+              'success': interview.score >= 85,
+              'warning': interview.score >= 70 && interview.score < 85,
+              'danger': interview.score < 70
+            }">{{ interview.score }}%</div>
+            <div class="time">{{ interview.time }}</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="interview-details">
+      <div class="profile-header">
+        <div class="avatar large" [ngStyle]="getAvatarStyle(selectedInterview.name)" style="font-size:2rem;">{{ getInitial(selectedInterview.name) }}</div>
+        <div class="profile-info">
+          <div class="name">{{ selectedInterview.name }}</div>
+          <div class="role">{{ selectedInterview.role }}</div>
+          <div class="meta">Interview: {{ selectedInterview.interviewTime }}</div>
+        </div>
+        <div class="fit-score">
+          <span class="label">AI Fit Score</span>
+          <div class="score success">{{ selectedInterview.fitScore }}%</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><span>{{ selectedInterview.duration }}</span><div>Duration</div></div>
+        <div class="stat"><span>{{ selectedInterview.questionsAnswered }}</span><div>Questions Answered</div></div>
+        <div class="stat"><span>{{ selectedInterview.confidenceLevel }}</span><div>Confidence Level</div></div>
+        <div class="stat"><span>{{ selectedInterview.technicalScore }}</span><div>Technical Score</div></div>
+      </div>
+      <div class="qa-section">
+        <h4>Interview Q&amp;A with AI Feedback</h4>
+        <div *ngFor="let qa of selectedInterview.qa" class="qa-block">
+          <div class="question">Q: <span>{{ qa.question }}</span></div>
+          <div class="answer">{{ qa.answer }}</div>
+          <div *ngIf="qa.aiFeedback" class="ai-feedback success">AI Feedback: {{ qa.aiFeedback }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

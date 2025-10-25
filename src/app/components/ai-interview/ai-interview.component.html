@@ -3,19 +3,37 @@
 </div>
 <div class="interview-page-container">
 
-  <aside class="sidebar-panel">
+  <aside class="sidebar-panel" *ngIf="showSidebar">
+  <button class="icon-btn toggle-sidebar-btn" (click)="toggleSidebar()" style="position: absolute; top: 18px; left: 18px; background: none; border: none; cursor: pointer;">
+      <span *ngIf="showSidebar">
+        <!-- Eye-off icon -->
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="10" fill="#eee" />
+          <path d="M4 11c2.5-4 7.5-4 10 0" stroke="#5d5cff" stroke-width="2" fill="none" />
+          <line x1="6" y1="16" x2="16" y2="6" stroke="#d40754" stroke-width="2" />
+        </svg>
+      </span>
+      <span *ngIf="!showSidebar">
+        <!-- Eye icon -->
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="10" fill="#eee" />
+          <path d="M4 11c2.5-4 7.5-4 10 0" stroke="#5d5cff" stroke-width="2" fill="none" />
+          <circle cx="11" cy="11" r="3" fill="#5d5cff" />
+        </svg>
+      </span>
+    </button>
     <div class="header">
       <span class="logo">🤖 AI Interview</span>
       <span class="sub-text">Voice Assistant</span>
     </div>
 
-    <div class="section-block progress-section">
+    <!-- <div class="section-block progress-section">
       <label>Progress</label>
       <div class="progress-indicator">3/10</div>
       <div class="progress-bar-shell">
         <div class="progress-bar-fill" style="width: 30%;"></div>
       </div>
-    </div>
+    </div> -->
 
     <div class="section-block settings-section">
       <h3>Settings</h3>
@@ -38,7 +56,7 @@
         <input type="checkbox" id="helper-tools">
       </div>
     </div>
-
+<!-- 
     <div class="section-block history-section">
       <h3>Question History</h3>
       <div class="history-item completed">
@@ -54,7 +72,7 @@
         <span class="text">Q3: Implement a binary search</span>
         <span class="current-label">Current</span>
       </div>
-    </div>
+    </div> -->
   </aside>
 
   <main class="main-content-panel">
