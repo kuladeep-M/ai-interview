@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { AIStreamService } from '../../services/ai-stream.service';
   templateUrl: './interview-start.component.html',
   styleUrls: ['./interview-start.component.scss']
 })
-export class InterviewStartComponent {
+export class InterviewStartComponent implements OnInit{
   ngOnInit() {
     if (this.userService.sessionId) {
       this.router.navigate(['/ai-interview']);

@@ -7,7 +7,7 @@ export class SessionGuard implements CanActivate {
   constructor(private userService: UserService, private router: Router) {}
 
   canActivate(): boolean {
-    if (this.userService.user) {
+    if (this.userService.sessionId) {
       return true;
     } else {
       this.router.navigate(['/']);

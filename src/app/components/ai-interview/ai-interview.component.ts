@@ -212,8 +212,30 @@ export class AiInterviewComponent implements OnInit {
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update((s) => s + 1);
     }, 1000);
-      // If no sessionId, send first prompt to start interview and process response
-      if (!this.userService.sessionId) {
+      // Send "I'm back" prompt if sessionId exists, else send first prompt
+      if (this.userService.sessionId) {
+        this.aiStreamService.sendMessageToModel("I'm back").subscribe({
+          next: async (aiResponse: string) => {
+            let responseText = '';
+            try {
+              const parsed = JSON.parse(aiResponse);
+              responseText = parsed.response || '';
+            } catch {
+              responseText = aiResponse;
+            }
+            this.conversationHistory.push({ speaker: 'ai', text: responseText });
+            const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+            await this.speechService.speak(spokenText, 'en-IN');
+            if (this.activeInputMode() === 'speech') {
+              this.speechService.startRecording();
+              this.isRecordingActive = true;
+            }
+          },
+          error: (err) => {
+            console.error('AI model error:', err);
+          }
+        });
+      } else {
         const user = this.userService.user;
         if (user) {
           const payload = {
@@ -223,11 +245,11 @@ export class AiInterviewComponent implements OnInit {
             job_description: ''
           };
           const firstMessage = `
-    ${JSON.stringify(payload, null, 2)}
+  ${JSON.stringify(payload, null, 2)}
 
-    You are an AI Interviewer.
-    Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
-    Begin by greeting the candidate warmly and then start the interview with your first question.`;
+  You are an AI Interviewer.
+  Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
+  Begin by greeting the candidate warmly and then start the interview with your first question.`;
           this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
             next: async (aiResponse: string) => {
               let responseText = '';
@@ -423,11 +445,11 @@ export class AiInterviewComponent implements OnInit {
    * Accepts either a string or NgxEditorModel.
    */
   onCodeEditorChange(ev: any): void {
-    const value = ev.target ? ev.target.value : ev.value; 
-    if (typeof value === 'string') {
-      this.codeEditorContent = value;
-    } else if (value && typeof value.value === 'string') {
-      this.codeEditorContent = value.value;
+    // ngx-monaco-editor (modelChange) emits the new value directly
+    if (typeof ev === 'string') {
+      this.codeEditorContent = ev;
+    } else if (ev && typeof ev.value === 'string') {
+      this.codeEditorContent = ev.value;
     }
   }
   setInputMode(mode: InputMode): void {
@@ -468,18 +490,20 @@ export class AiInterviewComponent implements OnInit {
       this.userTranscriptValue = '';
     } else if (this.activeInputMode() === 'code') {
       response = this.codeEditorContent;
+      // Debug log: show actual code value being submitted
+      console.log('[DEBUG] Code submitted:', response);
       // Show 'code' as string in UI, but push actual code to array
       this.conversationHistory.push({ speaker: 'user', text: 'code submitted' });
       this.processUserResponse(response);
-        // Switch off code mode after submit
-        this.activeInputMode.set('speech');
+      // Switch off code mode after submit
+      this.activeInputMode.set('speech');
     } else {
       response = this.userTranscript();
       // Speech mode already handled elsewhere
     }
     // Optionally send to backend for evaluation
     this.aiStreamService.sendUserMessage(response);
-    console.log(`SUBMITTED RESPONSE (Mode: ${this.activeInputMode()}): ${response}`);
+    console.log(`SUBMITTED RESPONSE (Mode: ${this.activeInputMode()}):`, response);
   }
 
   ngOnDestroy(): void {

@@ -8,6 +8,15 @@ export interface UserData {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+
+    UserService() {
+    const storedSessionId = localStorage.getItem('sessionId');
+    if (storedSessionId) {
+      this._sessionId.set(storedSessionId);
+      this._user.set(JSON.parse(localStorage.getItem('user') || 'null'));
+    }
+  }
+
   clearSessionId() {
     this._sessionId.set(null);
     localStorage.removeItem('sessionId');
