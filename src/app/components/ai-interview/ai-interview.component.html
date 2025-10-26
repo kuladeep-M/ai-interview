@@ -122,7 +122,7 @@
               </div>
             </div>
             }
-            <ng-container *ngIf="liveTranscript()">
+            <div *ngIf="liveTranscript()" class="minimal-bubble user" >
               <div class="avatar minimal-avatar">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="16" cy="20" r="14" fill="#6C63FF" />
@@ -138,7 +138,7 @@
                   <span class="chat-text minimal-text">{{ liveTranscript() }}</span>
                 </div>
               </div>
-            </ng-container>
+            </div>
 
           </div>
         </ng-container>

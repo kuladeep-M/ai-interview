@@ -1,20 +1,33 @@
 import { Injectable, NgZone } from '@angular/core';
+import { v4 as uuidv4 } from 'uuid';
 import { Observable, Subject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AIStreamService {
   private apiUrl = 'https://agent-prod.studio.lyzr.ai/v3/inference/chat/';
 
-  constructor(private zone: NgZone, private http: HttpClient) {}
+  constructor(
+    private zone: NgZone,
+    private http: HttpClient,
+    private userService: UserService
+  ) {}
 
   public sendMessageToModel(message: string): Observable<string> {
     console.log('Sending message to model:', message);
+    let sessionId = this.userService?.sessionId;
+    if (!sessionId) {
+      sessionId = uuidv4();
+      if (this.userService) {
+        this.userService.setSessionId(sessionId);
+      }
+    }
     const payload = {
       user_id: 'mem_cm7xmg15v0ghk0snc9yx26g1v',
       system_prompt_variables: {},
       agent_id: '68f951b6058210757bf615af',
-      session_id: '68fcf33abe2defc486f45551',
+      session_id: sessionId,
       message
     };
     const headers = new HttpHeaders({

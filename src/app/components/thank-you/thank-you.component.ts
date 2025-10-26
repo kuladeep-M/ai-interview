@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-thank-you',
@@ -9,8 +10,10 @@ import { Router } from '@angular/router';
 })
 export class ThankYouComponent {
   private router = inject(Router);
+  private userService = inject(UserService);
 
   takeInterview() {
+    this.userService.clearSessionId();
     this.router.navigate(['/']);
   }
 }

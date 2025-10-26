@@ -48,15 +48,31 @@ export class VoiceService implements OnDestroy {
 
     return new Promise((resolve) => {
       const utter = new SpeechSynthesisUtterance(text);
-      // Force Indian English only
-      utter.lang = 'en-IN';
-      // Always try to select Indian English voice
+      // Try to use a more natural voice
       const voices = window.speechSynthesis.getVoices();
-      const indianVoice = voices.find(v => v.lang === 'en-IN');
-      if (indianVoice) {
-        utter.voice = indianVoice;
+      // Preferred voices (customize as needed)
+      const preferredVoices = [
+        'Google UK English Female',
+        'Google US English',
+        'Microsoft Aria Online (Natural) - English (United States)',
+        'Microsoft Jenny Online (Natural) - English (United States)',
+        'Google English',
+      ];
+      let selectedVoice = voices.find(v => preferredVoices.includes(v.name));
+      if (!selectedVoice) {
+        // Fallback to Indian English
+        selectedVoice = voices.find(v => v.lang === 'en-IN');
       }
-      // If not found, will use 'en-IN' language with default voice
+      if (!selectedVoice) {
+        // Fallback to any English voice
+        selectedVoice = voices.find(v => v.lang.startsWith('en'));
+      }
+      if (selectedVoice) {
+        utter.voice = selectedVoice;
+        utter.lang = selectedVoice.lang;
+      } else {
+        utter.lang = 'en-US';
+      }
       utter.onend = () => {
         this.isSpeakingSubject.next(false);
         resolve();

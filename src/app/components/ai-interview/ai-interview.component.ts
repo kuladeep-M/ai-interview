@@ -6,6 +6,7 @@ import { VoiceService } from '../../services/voice.service';
 import { AIStreamService } from '../../services/ai-stream.service';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 
 export type InputMode = 'speech' | 'text' | 'code';
 // ai-interview.component.ts
@@ -23,6 +24,7 @@ export class AiInterviewComponent implements OnInit {
    * Handles End Interview button click: adds message to chat, makes API call, and navigates to thank you screen.
    */
   private router = inject(Router);
+    private userService = inject(UserService);
 
   onEndInterview(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'End Interview' });
@@ -196,6 +198,45 @@ export class AiInterviewComponent implements OnInit {
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update((s) => s + 1);
     }, 1000);
+      // If no sessionId, send first prompt to start interview and process response
+      if (!this.userService.sessionId) {
+        const user = this.userService.user;
+        if (user) {
+          const payload = {
+            candidate_name: user.name,
+            job_role: user.role,
+            experience_level: '',
+            job_description: ''
+          };
+          const firstMessage = `
+    ${JSON.stringify(payload, null, 2)}
+
+    You are an AI Interviewer.
+    Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
+    Begin by greeting the candidate warmly and then start the interview with your first question.`;
+          this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
+            next: async (aiResponse: string) => {
+              let responseText = '';
+              try {
+                const parsed = JSON.parse(aiResponse);
+                responseText = parsed.response || '';
+              } catch {
+                responseText = aiResponse;
+              }
+              this.conversationHistory.push({ speaker: 'ai', text: responseText });
+              const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+              await this.speechService.speak(spokenText, 'en-IN');
+              if (this.activeInputMode() === 'speech') {
+                this.speechService.startRecording();
+                this.isRecordingActive = true;
+              }
+            },
+            error: (err) => {
+              console.error('AI model error:', err);
+            }
+          });
+        }
+      }
   }
   get formattedTimer(): string {
     const min = Math.floor(this.timerSeconds() / 60);

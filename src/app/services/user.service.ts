@@ -8,10 +8,25 @@ export interface UserData {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+  clearSessionId() {
+    this._sessionId.set(null);
+    localStorage.removeItem('sessionId');
+  }
   private _user: WritableSignal<UserData | null> = signal(null);
+  private _sessionId: WritableSignal<string | null> = signal(null);
 
   setUser(user: UserData) {
     this._user.set(user);
+  }
+
+  setSessionId(sessionId: string) {
+    this._sessionId.set(sessionId);
+    localStorage.setItem('sessionId', sessionId);
+  }
+
+  get sessionId(): string | null {
+    // Prefer signal, fallback to localStorage
+    return this._sessionId() || localStorage.getItem('sessionId');
   }
 
   get user(): UserData | null {
