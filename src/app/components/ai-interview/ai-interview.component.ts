@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, WritableSignal, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { map, Subscription, Subject, switchMap } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
 import { AIStreamService } from '../../services/ai-stream.service';
@@ -18,6 +19,24 @@ export type InputMode = 'speech' | 'text' | 'code';
   // No providers needed for ngx-monaco-editor-v2
 })
 export class AiInterviewComponent implements OnInit {
+  /**
+   * Handles End Interview button click: adds message to chat, makes API call, and navigates to thank you screen.
+   */
+  private router = inject(Router);
+
+  onEndInterview(): void {
+    this.conversationHistory.push({ speaker: 'user', text: 'End Interview' });
+    this.aiStreamService.sendUserMessage('End Interview');
+    // Navigate to thank you screen using Angular Router
+    this.router.navigate(['/thank-you']);
+  }
+  /**
+   * Handles Pass/Skip button click: adds message to chat and makes API call.
+   */
+  onPassSkip(): void {
+    this.conversationHistory.push({ speaker: 'user', text: 'Pass / Skip' });
+    this.processUserResponse('Pass / Skip');
+  }
   // For text input Enter key submit
   onTextAreaKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {

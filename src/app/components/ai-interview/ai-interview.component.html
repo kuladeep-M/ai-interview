@@ -80,7 +80,7 @@
       <h2>Technical Interview</h2>
       <p>Senior Frontend Developer Position</p>
       <span class="time-limit">⏱ {{ formattedTimer }}</span>
-      <button class="btn btn-end-interview">🛑 End Interview</button>
+  <button class="btn btn-end-interview" (click)="onEndInterview()">🛑 End Interview</button>
     </header>
 
     <section class="ai-question-block">
@@ -203,7 +203,7 @@
       <div class="response-controls">
 
         <div class="control-group left">
-          <button class="btn btn-skip">
+          <button class="btn btn-skip" (click)="onPassSkip()">
             <span class="icon-skip">
               <!-- Double forward arrow icon -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -270,7 +270,7 @@
           </button>
         </div>
 
-        <div class="control-group right" >
+        <div style="width: 204px;" class="control-group right" >
           <button class="btn btn-submit" *ngIf="activeInputMode() !== 'speech'" (click)="submitAnswer()">
             <span class="icon-submit">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">

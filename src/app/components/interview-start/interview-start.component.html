@@ -1,0 +1,21 @@
+<div class="interview-start-container">
+  <h2>Start Your Interview</h2>
+  <form (ngSubmit)="startInterview()" #startForm="ngForm">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" name="name" [(ngModel)]="name" required />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" [(ngModel)]="email" required />
+    </div>
+    <div class="form-group">
+      <label for="role">Role Applied For</label>
+      <select id="role" name="role" [(ngModel)]="role" required>
+        <option value="" disabled selected>Select a role</option>
+        <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-start" [disabled]="!name || !email || !role">Start Interview</button>
+  </form>
+</div>
