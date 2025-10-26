@@ -393,7 +393,8 @@ export class AiInterviewComponent implements OnInit {
       this.userTranscriptValue = '';
     } else if (this.activeInputMode() === 'code') {
       response = this.codeEditorContent;
-      this.conversationHistory.push({ speaker: 'user', text: response });
+      // Show 'code' as string in UI, but push actual code to array
+      this.conversationHistory.push({ speaker: 'user', text: 'code submitted' });
       this.processUserResponse(response);
     } else {
       response = this.userTranscript();
