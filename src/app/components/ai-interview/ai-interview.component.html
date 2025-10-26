@@ -196,7 +196,7 @@
             </ngx-monaco-editor>
           </div>
         </div>
-  <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder" placeholder="Type your text response here..."></textarea>
+  <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder" placeholder="Type your text response here..." [(ngModel)]="userTranscriptValue" (keydown)="onTextAreaKeydown($event)"></textarea>
       </div>
 
 

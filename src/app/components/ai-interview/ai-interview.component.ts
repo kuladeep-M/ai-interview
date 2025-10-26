@@ -18,10 +18,19 @@ export type InputMode = 'speech' | 'text' | 'code';
   // No providers needed for ngx-monaco-editor-v2
 })
 export class AiInterviewComponent implements OnInit {
+  // For text input Enter key submit
+  onTextAreaKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      this.submitAnswer();
+      event.preventDefault();
+    }
+  }
+  // For text input binding
+  public userTranscriptValue: string = '';
   private aiRequestSubject = new Subject<string>();
   private aiRequestSubscription: Subscription | null = null;
   private aiBuffer: string[] = [];
-  private aiInFlight = false;
+  public aiInFlight = false;
   private lastProcessedIndex = 0;
 
   processUserResponse(userMessage: string): void {
@@ -33,46 +42,51 @@ export class AiInterviewComponent implements OnInit {
       // No request in-flight, reset buffer and processed index
       this.aiBuffer = [userMessage];
       this.lastProcessedIndex = 0;
-      this.aiRequestSubject.next('');
-    }
-    if (!this.aiRequestSubscription) {
-      this.aiRequestSubscription = this.aiRequestSubject.pipe(
-        switchMap(() => {
-          const unsentMessages = this.aiBuffer.slice(this.lastProcessedIndex);
-          const combined = unsentMessages.join(' ');
-          this.aiInFlight = true;
-          // Pause mic before AI speaks
-          if (this.isRecordingActive) {
-            this.speechService.pauseRecording();
-            this.isRecordingActive = false;
+      if (!this.aiRequestSubscription) {
+        this.aiRequestSubscription = this.aiRequestSubject.pipe(
+          switchMap(() => {
+            const unsentMessages = this.aiBuffer.slice(this.lastProcessedIndex);
+            const combined = unsentMessages.join(' ');
+            this.aiInFlight = true;
+            // Pause mic before AI speaks
+            if (this.isRecordingActive) {
+              this.speechService.pauseRecording();
+              this.isRecordingActive = false;
+            }
+            return this.aiStreamService.sendMessageToModel(combined);
+          })
+        ).subscribe({
+          next: async (aiResponse: string) => {
+            let responseText = '';
+            try {
+              const parsed = JSON.parse(aiResponse);
+              responseText = parsed.response || '';
+            } catch {
+              responseText = aiResponse;
+            }
+            this.conversationHistory.push({ speaker: 'ai', text: responseText });
+            // Remove markdown before speaking
+            const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+            await this.speechService.speak(spokenText, 'en-IN');
+            if (this.activeInputMode() === 'speech') {
+              this.speechService.startRecording();
+              this.isRecordingActive = true;
+            }
+            // After success, mark all messages as processed and clear buffer
+            this.lastProcessedIndex = 0;
+            this.aiBuffer = [];
+            this.aiInFlight = false;
+          },
+          error: (err) => {
+            console.error('AI model error:', err);
+            this.aiInFlight = false;
           }
-          return this.aiStreamService.sendMessageToModel(combined);
-        })
-      ).subscribe({
-        next: async (aiResponse: string) => {
-          let responseText = '';
-          try {
-            const parsed = JSON.parse(aiResponse);
-            responseText = parsed.response || '';
-          } catch {
-            responseText = aiResponse;
-          }
-          this.conversationHistory.push({ speaker: 'ai', text: responseText });
-          await this.speechService.speak(responseText, 'en-IN');
-          if (this.activeInputMode() === 'speech') {
-            this.speechService.startRecording();
-            this.isRecordingActive = true;
-          }
-          // After success, mark all messages as processed and clear buffer
-          this.lastProcessedIndex = 0;
-          this.aiBuffer = [];
-          this.aiInFlight = false;
-        },
-        error: (err) => {
-          console.error('AI model error:', err);
-          this.aiInFlight = false;
-        }
-      });
+        });
+        // Trigger the first request immediately after subscription setup
+        this.aiRequestSubject.next('');
+      } else {
+        this.aiRequestSubject.next('');
+      }
     }
   }
   public selectedLanguage: string = 'javascript';
@@ -368,12 +382,26 @@ export class AiInterviewComponent implements OnInit {
    * Handles the final submission, whether it's transcribed speech or written code.
    */
   submitAnswer(): void {
-    const response =
-      this.activeInputMode() === 'speech' ? this.userTranscript() : this.codeEditorContent;
-    // Send user response to AI backend via WebSocket
+    // Stop any ongoing AI speech immediately on submit
+    this.speechService.stopSpeaking();
+    let response = '';
+    if (this.activeInputMode() === 'text') {
+      response = this.userTranscriptValue;
+      this.userTranscript.set(response);
+      this.conversationHistory.push({ speaker: 'user', text: response });
+      this.processUserResponse(response);
+      this.userTranscriptValue = '';
+    } else if (this.activeInputMode() === 'code') {
+      response = this.codeEditorContent;
+      this.conversationHistory.push({ speaker: 'user', text: response });
+      this.processUserResponse(response);
+    } else {
+      response = this.userTranscript();
+      // Speech mode already handled elsewhere
+    }
+    // Optionally send to backend for evaluation
     this.aiStreamService.sendUserMessage(response);
     console.log(`SUBMITTED RESPONSE (Mode: ${this.activeInputMode()}): ${response}`);
-    // TODO: Send response to backend for evaluation
   }
 
   ngOnDestroy(): void {
