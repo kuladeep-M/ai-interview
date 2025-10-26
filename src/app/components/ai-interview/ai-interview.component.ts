@@ -30,6 +30,8 @@ export class AiInterviewComponent implements OnInit {
   onEndInterview(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'End Interview' });
     this.aiStreamService.sendUserMessage('End Interview');
+    this.userService.clearSessionId();
+    this.userService.clearUser();
     // Navigate to thank you screen using Angular Router
     this.router.navigate(['/thank-you']);
   }
@@ -212,67 +214,69 @@ export class AiInterviewComponent implements OnInit {
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update((s) => s + 1);
     }, 1000);
-      // Send "I'm back" prompt if sessionId exists, else send first prompt
-      if (this.userService.sessionId) {
-        this.aiStreamService.sendMessageToModel("I'm back").subscribe({
-          next: async (aiResponse: string) => {
-            let responseText = '';
-            try {
-              const parsed = JSON.parse(aiResponse);
-              responseText = parsed.response || '';
-            } catch {
-              responseText = aiResponse;
-            }
-            this.conversationHistory.push({ speaker: 'ai', text: responseText });
-            const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
-            await this.speechService.speak(spokenText, 'en-IN');
-            if (this.activeInputMode() === 'speech') {
-              this.speechService.startRecording();
-              this.isRecordingActive = true;
-            }
-          },
-          error: (err) => {
-            console.error('AI model error:', err);
-          }
-        });
-      } else {
-        const user = this.userService.user;
-        if (user) {
-          const payload = {
-            candidate_name: user.name,
-            job_role: user.role,
-            experience_level: '',
-            job_description: ''
-          };
-          const firstMessage = `
-  ${JSON.stringify(payload, null, 2)}
 
-  You are an AI Interviewer.
-  Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
-  Begin by greeting the candidate warmly and then start the interview with your first question.`;
-          this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
-            next: async (aiResponse: string) => {
-              let responseText = '';
-              try {
-                const parsed = JSON.parse(aiResponse);
-                responseText = parsed.response || '';
-              } catch {
-                responseText = aiResponse;
-              }
-              this.conversationHistory.push({ speaker: 'ai', text: responseText });
-              const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
-              await this.speechService.speak(spokenText, 'en-IN');
-              if (this.activeInputMode() === 'speech') {
-                this.speechService.startRecording();
-                this.isRecordingActive = true;
-              }
-            },
-            error: (err) => {
-              console.error('AI model error:', err);
-            }
-          });
+    // Prevent duplicate API calls for new users
+    const sessionId = this.userService.sessionId;
+    const user = this.userService.user;
+    // If sessionId exists and user data exists, treat as returning user
+    if (sessionId) {
+      this.aiStreamService.sendMessageToModel("I'm back").subscribe({
+        next: async (aiResponse: string) => {
+          let responseText = '';
+          try {
+            const parsed = JSON.parse(aiResponse);
+            responseText = parsed.response || '';
+          } catch {
+            responseText = aiResponse;
+          }
+          this.conversationHistory.push({ speaker: 'ai', text: responseText });
+          const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+          await this.speechService.speak(spokenText, 'en-IN');
+          if (this.activeInputMode() === 'speech') {
+            this.speechService.startRecording();
+            this.isRecordingActive = true;
+          }
+        },
+        error: (err) => {
+          console.error('AI model error:', err);
         }
-      }
+      });
+    } else if (user) {
+      // Only send first prompt for new users (no sessionId in localStorage)
+      const payload = {
+        candidate_name: user.name,
+        job_role: user.role,
+        experience_level: '',
+        job_description: ''
+      };
+      const firstMessage = `
+${JSON.stringify(payload, null, 2)}
+
+You are an AI Interviewer.
+Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
+Begin by greeting the candidate warmly and then start the interview with your first question.`;
+      this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
+        next: async (aiResponse: string) => {
+          let responseText = '';
+          try {
+            const parsed = JSON.parse(aiResponse);
+            responseText = parsed.response || '';
+          } catch {
+            responseText = aiResponse;
+          }
+          this.conversationHistory.push({ speaker: 'ai', text: responseText });
+          const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+          await this.speechService.speak(spokenText, 'en-IN');
+          if (this.activeInputMode() === 'speech') {
+            this.speechService.startRecording();
+            this.isRecordingActive = true;
+          }
+        },
+        error: (err) => {
+          console.error('AI model error:', err);
+        }
+      });
+    }
   }
   get formattedTimer(): string {
     const min = Math.floor(this.timerSeconds() / 60);
