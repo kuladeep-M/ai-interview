@@ -130,7 +130,18 @@
                 </ng-template>
               </div>
               <div class="bubble-content minimal-content">
-                <span class="chat-text minimal-text">{{ chat.text }}</span>
+                <ng-container *ngIf="chat.speaker === 'ai'; else userText">
+                  <div class="ai-message-bubble">
+                    <ng-container *ngIf="getAiMessageParts(chat.text) as parts">
+                      <div *ngIf="parts.question" class="ai-question" [innerHTML]="parts.question"></div>
+                      <div *ngIf="parts.rest" class="ai-rest" [innerHTML]="parts.rest"></div>
+                      <pre *ngIf="parts.code" class="ai-code-block"><code [innerHTML]="parts.code"></code></pre>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #userText>
+                  <span class="chat-text minimal-text">{{ chat.text }}</span>
+                </ng-template>
                 <span *ngIf="chat.speaker === 'ai' && aiSpeaking() && !isRecordingActive" class="ai-speaking-indicator">
                   <span class="ai-pulse-dot"></span>
                   <span class="ai-speaking-label">Speaking...</span>

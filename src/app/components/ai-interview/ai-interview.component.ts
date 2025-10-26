@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, WritableSignal, ChangeDetectorRef } from '@angular/core';
-import { map, Subscription } from 'rxjs';
+import { map, Subscription, Subject, switchMap } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
 import { AIStreamService } from '../../services/ai-stream.service';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
@@ -18,6 +18,63 @@ export type InputMode = 'speech' | 'text' | 'code';
   // No providers needed for ngx-monaco-editor-v2
 })
 export class AiInterviewComponent implements OnInit {
+  private aiRequestSubject = new Subject<string>();
+  private aiRequestSubscription: Subscription | null = null;
+  private aiBuffer: string[] = [];
+  private aiInFlight = false;
+  private lastProcessedIndex = 0;
+
+  processUserResponse(userMessage: string): void {
+    if (this.aiInFlight) {
+      // Buffer messages only while a request is in-flight
+      this.aiBuffer.push(userMessage);
+      this.aiRequestSubject.next(''); // Cancel and trigger new request
+    } else {
+      // No request in-flight, reset buffer and processed index
+      this.aiBuffer = [userMessage];
+      this.lastProcessedIndex = 0;
+      this.aiRequestSubject.next('');
+    }
+    if (!this.aiRequestSubscription) {
+      this.aiRequestSubscription = this.aiRequestSubject.pipe(
+        switchMap(() => {
+          const unsentMessages = this.aiBuffer.slice(this.lastProcessedIndex);
+          const combined = unsentMessages.join(' ');
+          this.aiInFlight = true;
+          // Pause mic before AI speaks
+          if (this.isRecordingActive) {
+            this.speechService.pauseRecording();
+            this.isRecordingActive = false;
+          }
+          return this.aiStreamService.sendMessageToModel(combined);
+        })
+      ).subscribe({
+        next: async (aiResponse: string) => {
+          let responseText = '';
+          try {
+            const parsed = JSON.parse(aiResponse);
+            responseText = parsed.response || '';
+          } catch {
+            responseText = aiResponse;
+          }
+          this.conversationHistory.push({ speaker: 'ai', text: responseText });
+          await this.speechService.speak(responseText, 'en-IN');
+          if (this.activeInputMode() === 'speech') {
+            this.speechService.startRecording();
+            this.isRecordingActive = true;
+          }
+          // After success, mark all messages as processed and clear buffer
+          this.lastProcessedIndex = 0;
+          this.aiBuffer = [];
+          this.aiInFlight = false;
+        },
+        error: (err) => {
+          console.error('AI model error:', err);
+          this.aiInFlight = false;
+        }
+      });
+    }
+  }
   public selectedLanguage: string = 'javascript';
   onLanguageChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
@@ -99,18 +156,13 @@ export class AiInterviewComponent implements OnInit {
   public activeInputMode: WritableSignal<any> = signal('speech');
   public codeEditorContent = "// Sample JavaScript function\nfunction greet(name) {\n  return 'Hello, ' + name + '!';\n}\n\ngreet('World');";
    ngOnInit(): void {
+    // Stop any ongoing AI speech on reload/init
+    this.speechService.stopSpeaking();
     // Start timer when interview screen loads
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
       this.timerSeconds.update((s) => s + 1);
     }, 1000);
-
-    // Connect to AI WebSocket stream
-    this.aiStreamService.connect(this.wsUrl);
-    this.aiStreamSubscription = this.aiStreamService.response$.subscribe((aiChunk: string) => {
-      this.conversationHistory.push({ speaker: 'ai', text: aiChunk });
-      this.speechService.speak(aiChunk);
-    });
   }
   get formattedTimer(): string {
     const min = Math.floor(this.timerSeconds() / 60);
@@ -124,14 +176,13 @@ export class AiInterviewComponent implements OnInit {
   toggleRecording(): void {
     if (this.activeInputMode() === 'code') return; // Ignore if in code mode
 
-    if (this.recordSubscription && this.isRecordingActive) {
-      // State 1: Currently Listening -> PAUSE
+    // When user clicks button, stop any AI speech
+    this.speechService.stopSpeaking();
+
+    // Toggle mic state
+    if (this.isRecordingActive) {
       this.pauseRecording();
-    } else if (this.recordSubscription && !this.isRecordingActive) {
-      // State 2: Paused -> RESUME (by calling startRecording)
-      this.startRecording();
     } else {
-      // State 3: Stopped/Initial -> START
       this.startRecording();
     }
   }
@@ -311,22 +362,7 @@ export class AiInterviewComponent implements OnInit {
       }
     }
   }
-  /**
-   * Placeholder for the logic that happens after a transcript is received.
-   */
-  private processUserResponse(transcript: string): void {
-    // Stop listening after a final result is received (optional, based on flow)
-    // this.stopRecording();
-    console.log('prcoessing',transcript)
-    this.aiSpeaking.set(true);
-    // Use the service to generate a mock speech response
-    const aiText = 'Processing your response...';
-    this.conversationHistory.push({ speaker: 'ai', text: aiText });
-    this.speechService.speak(aiText).then(() => {
-      this.aiSpeaking.set(false);
-      // After AI speaks, either automatically resume or wait for user input
-    });
-  }
+  
 
   /**
    * Handles the final submission, whether it's transcribed speech or written code.
@@ -342,6 +378,8 @@ export class AiInterviewComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.stopRecording();
+    // Stop any ongoing AI speech on destroy
+    this.speechService.stopSpeaking();
     // TODO: Unsubscribe from other service streams if needed
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -352,5 +390,34 @@ export class AiInterviewComponent implements OnInit {
       this.aiStreamSubscription.unsubscribe();
       this.aiStreamSubscription = null;
     }
+  }
+  getAiMessageParts(text: string): { question: string, rest: string, code: string } {
+    // Preserve original sequence, only format bolded question and code blocks
+    let formatted = text;
+
+    // Format code blocks (triple backticks)
+    formatted = formatted.replace(/```([\s\S]*?)```/g, (m, code) => {
+      return `<pre class='ai-code-block'><code>${code.trim()}</code></pre>`;
+    });
+
+    // Format text between ### as italic (markdown header)
+    formatted = formatted.replace(/###\s*([^\n]+)/g, (m, header) => {
+      return `<div class='ai-header'><i>${header.trim()}</i></div>`;
+    });
+
+    // Format text between *** as bold
+    formatted = formatted.replace(/\*\*\*([^*]+)\*\*\*/g, (m, boldText) => {
+      return `<b>${boldText.trim()}</b>&nbsp;`;
+    });
+
+    // Format bolded question (double asterisks)
+    formatted = formatted.replace(/\*\*([^*]+)\*\*/g, (m, q) => {
+      return `<div class='ai-question'><b>${q.trim()}</b></div>`;
+    });
+
+    // Format inline code
+    formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    return { question: '', rest: formatted, code: '' };
   }
 }

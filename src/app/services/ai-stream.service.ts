@@ -1,13 +1,34 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AIStreamService {
+  private apiUrl = 'https://agent-prod.studio.lyzr.ai/v3/inference/chat/';
+
+  constructor(private zone: NgZone, private http: HttpClient) {}
+
+  public sendMessageToModel(message: string): Observable<string> {
+    console.log('Sending message to model:', message);
+    const payload = {
+      user_id: 'mem_cm7xmg15v0ghk0snc9yx26g1v',
+      system_prompt_variables: {},
+      agent_id: '68f951b6058210757bf615af',
+      session_id: '68fcf33abe2defc486f45551',
+      message
+    };
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'x-api-key': 'sk-default-mQGXmVH9iXVv4Ao54nxsBGsgJxSqEJZs'
+    });
+    return this.http.post(this.apiUrl, payload, { headers, responseType: 'text' });
+  }
+  
   private ws: WebSocket | null = null;
   private responseSubject = new Subject<string>();
   public response$: Observable<string> = this.responseSubject.asObservable();
 
-  constructor(private zone: NgZone) {}
+  // Removed duplicate constructor
 
   connect(url: string): void {
     if (this.ws) {

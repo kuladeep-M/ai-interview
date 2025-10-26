@@ -47,11 +47,16 @@ export class VoiceService implements OnDestroy {
     this.isSpeakingSubject.next(true);
 
     return new Promise((resolve) => {
-      // const utter = new SpeechSynthesisUtterance(text);
-      const utter = new SpeechSynthesisUtterance("Speaking now");
-      utter.lang = lang;
-
-      // Resolve the promise and update state when speaking is done
+      const utter = new SpeechSynthesisUtterance(text);
+      // Force Indian English only
+      utter.lang = 'en-IN';
+      // Always try to select Indian English voice
+      const voices = window.speechSynthesis.getVoices();
+      const indianVoice = voices.find(v => v.lang === 'en-IN');
+      if (indianVoice) {
+        utter.voice = indianVoice;
+      }
+      // If not found, will use 'en-IN' language with default voice
       utter.onend = () => {
         this.isSpeakingSubject.next(false);
         resolve();
@@ -73,6 +78,11 @@ export class VoiceService implements OnDestroy {
 
   stopRecording(): void {
     this.recordingTrigger$.next(false);
+  }
+
+  stopSpeaking(): void {
+    window.speechSynthesis.cancel();
+    this.isSpeakingSubject.next(false);
   }
 
   ngOnDestroy(): void {
