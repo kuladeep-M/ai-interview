@@ -20,6 +20,7 @@ export type InputMode = 'speech' | 'text' | 'code';
   // No providers needed for ngx-monaco-editor-v2
 })
 export class AiInterviewComponent implements OnInit {
+  chatWindow: HTMLElement | null = null;
   /**
    * Handles End Interview button click: adds message to chat, makes API call, and navigates to thank you screen.
    */
@@ -191,6 +192,19 @@ export class AiInterviewComponent implements OnInit {
   public activeInputMode: WritableSignal<any> = signal('speech');
   public codeEditorContent = "// Sample JavaScript function\nfunction greet(name) {\n  return 'Hello, ' + name + '!';\n}\n\ngreet('World');";
    ngOnInit(): void {
+    // Scroll to bottom when new message is added
+    const observer = new MutationObserver(() => {
+      if (this.chatWindow) {
+        this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
+      }
+    });
+    setTimeout(() => {
+      const el = document.querySelector('.chat-window.minimal-chat') as HTMLElement;
+      if (el) {
+        this.chatWindow = el;
+        observer.observe(el, { childList: true, subtree: true });
+      }
+    }, 0);
     // Stop any ongoing AI speech on reload/init
     this.speechService.stopSpeaking();
     // Start timer when interview screen loads
