@@ -1,10 +1,8 @@
-<div *ngIf="!showUserSpeakingText() && isRecordingActive" class="input-indicator-bar">
-  <span class="pulse-dot"></span> Listening for input...
-</div>
 <div class="interview-page-container">
 
   <aside class="sidebar-panel" *ngIf="showSidebar">
-  <button class="icon-btn toggle-sidebar-btn" (click)="toggleSidebar()" style="position: absolute; top: 18px; left: 18px; background: none; border: none; cursor: pointer;">
+    <button class="icon-btn toggle-sidebar-btn" (click)="toggleSidebar()"
+      style="position: absolute; top: 18px; left: 18px; background: none; border: none; cursor: pointer;">
       <span *ngIf="showSidebar">
         <!-- Eye-off icon -->
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -26,15 +24,6 @@
       <span class="logo">🤖 AI Interview</span>
       <span class="sub-text">Voice Assistant</span>
     </div>
-
-    <!-- <div class="section-block progress-section">
-      <label>Progress</label>
-      <div class="progress-indicator">3/10</div>
-      <div class="progress-bar-shell">
-        <div class="progress-bar-fill" style="width: 30%;"></div>
-      </div>
-    </div> -->
-
     <div class="section-block settings-section">
       <h3>Settings</h3>
       <div class="setting-item">
@@ -56,23 +45,7 @@
         <input type="checkbox" id="helper-tools">
       </div>
     </div>
-<!-- 
-    <div class="section-block history-section">
-      <h3>Question History</h3>
-      <div class="history-item completed">
-        <span class="status-icon">✓</span>
-        <span class="text">Q1: Tell me about yourself</span>
-      </div>
-      <div class="history-item completed">
-        <span class="status-icon">✓</span>
-        <span class="text">Q2: Your experience with React</span>
-      </div>
-      <div class="history-item current">
-        <span class="status-icon">›</span>
-        <span class="text">Q3: Implement a binary search</span>
-        <span class="current-label">Current</span>
-      </div>
-    </div> -->
+    
   </aside>
 
   <main class="main-content-panel">
@@ -80,7 +53,7 @@
       <h2>Technical Interview</h2>
       <p>Senior Frontend Developer Position</p>
       <span class="time-limit">⏱ {{ formattedTimer }}</span>
-  <button class="btn btn-end-interview" (click)="onEndInterview()">🛑 End Interview</button>
+      <button class="btn btn-end-interview" (click)="onEndInterview()">🛑 End Interview</button>
     </header>
 
     <section class="ai-question-block">
@@ -88,8 +61,8 @@
       <div class="ai-speech-bubble">
         <p class="ai-status">
           <span style="color: #5d5cff; font-weight: 600;">AI Interviewer</span>
-          <span *ngIf="aiSpeaking() && !showAISpeakingText() && !isRecordingActive"
-            class="ai-top-speaking-indicator" style="margin-left: 12px;">
+          <span *ngIf="aiSpeaking() && !showAISpeakingText() && !isRecordingActive" class="ai-top-speaking-indicator"
+            style="margin-left: 12px;">
             <svg width="22" height="22" viewBox="0 0 22 22" style="vertical-align: middle; margin-right: 4px;">
               <circle cx="11" cy="11" r="10" fill="#388e3c" />
               <path d="M11 6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2v2" stroke="#fff" stroke-width="2" stroke-linecap="round"
@@ -100,7 +73,7 @@
             <span style="color: #388e3c; font-weight: 600; font-size: 1.1em;">Speaking...</span>
           </span>
         </p>
-        <ng-container *ngIf="showAISpeakingText() || showUserSpeakingText(); else speakingIndicator">
+        <ng-container>
           <div class="chat-window minimal-chat" #chatWindow>
             @for (chat of conversationHistory.slice(-4); track chat; let i = $index) {
             <div *ngIf="chat.speaker === 'ai' ? showAISpeakingText() : showUserSpeakingText()"
@@ -140,7 +113,7 @@
                   </div>
                 </ng-container>
                 <ng-template #userText>
-                  <span class="chat-text minimal-text">{{ chat.text }}</span>
+                  <span class="chat-text-user minimal-text">{{ chat.text }}</span>
                 </ng-template>
                 <span *ngIf="chat.speaker === 'ai' && aiSpeaking() && !isRecordingActive" class="ai-speaking-indicator">
                   <span class="ai-pulse-dot"></span>
@@ -149,28 +122,26 @@
               </div>
             </div>
             }
-            <div *ngIf="liveTranscript()" class="chat-bubble user live minimal-bubble"
-              (ngAfterViewInit)="chatWindow.scrollTop = chatWindow.scrollHeight"
-              (ngOnChanges)="chatWindow.scrollTop = chatWindow.scrollHeight">
-                <div class="avatar minimal-avatar">
+            <ng-container *ngIf="liveTranscript()">
+              <div class="avatar minimal-avatar">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="16" cy="20" r="14" fill="#6C63FF" />
                   <text x="16" y="22" text-anchor="middle" font-size="16" fill="#fff" font-family="Arial, sans-serif"
                     dominant-baseline="middle">K</text>
                 </svg>
               </div>
-              <div class="bubble-content minimal-content">
-                <span class="chat-text minimal-text">{{ liveTranscript() }}</span>
+              <div class="chat-bubble user live minimal-bubble"
+                (ngAfterViewInit)="chatWindow.scrollTop = chatWindow.scrollHeight"
+                (ngOnChanges)="chatWindow.scrollTop = chatWindow.scrollHeight">
+
+                <div class="bubble-content minimal-content">
+                  <span class="chat-text minimal-text">{{ liveTranscript() }}</span>
+                </div>
               </div>
-            </div>
+            </ng-container>
+
           </div>
         </ng-container>
-        <ng-template #speakingIndicator>
-          <div *ngIf="showUserSpeakingText() && !isRecordingActive && (liveTranscript() || userSpeakingIndicator())"
-            class="user-speaking-indicator">
-            🧑 User is speaking...
-          </div>
-        </ng-template>
       </div>
     </section>
 
@@ -181,22 +152,24 @@
         <div *ngIf="activeInputMode() === 'code'">
           <div class="editor-toolbar" style="margin-bottom: 8px;">
             <label for="language-select" style="margin-right: 8px; font-weight: 500;">Language:</label>
-            <select id="language-select" [(ngModel)]="selectedLanguage" (change)="onLanguageChange($event)" style="padding: 4px 8px; border-radius: 4px;">
+            <select id="language-select" [(ngModel)]="selectedLanguage" (change)="onLanguageChange($event)"
+              style="padding: 4px 8px; border-radius: 4px;">
               <option value="javascript">JavaScript</option>
               <option value="typescript">TypeScript</option>
               <option value="csharp">C#</option>
             </select>
           </div>
           <div class="code-editor-wrapper">
-            <ngx-monaco-editor
-              [options]="codeEditorOptions"
+            <ngx-monaco-editor [options]="codeEditorOptions"
               [model]="{ value: codeEditorContent, language: selectedLanguage }"
               (modelChange)="onCodeEditorChange($event)"
               style="height:300px;width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(44,62,80,0.10);">
             </ngx-monaco-editor>
           </div>
         </div>
-  <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder" placeholder="Type your text response here..." [(ngModel)]="userTranscriptValue" (keydown)="onTextAreaKeydown($event)"></textarea>
+        <textarea *ngIf="activeInputMode() === 'text'" class="response-editor-placeholder"
+          placeholder="Type your text response here..." [(ngModel)]="userTranscriptValue"
+          (keydown)="onTextAreaKeydown($event)"></textarea>
       </div>
 
 
@@ -270,7 +243,7 @@
           </button>
         </div>
 
-        <div style="width: 204px;" class="control-group right" >
+        <div style="width: 204px;" class="control-group right">
           <button class="btn btn-submit" *ngIf="activeInputMode() !== 'speech'" (click)="submitAnswer()">
             <span class="icon-submit">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">

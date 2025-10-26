@@ -3,7 +3,14 @@
     position: relative;
     transition: min-height 0.2s;
 }
-
+.chat-text-user{
+    color: black;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    padding: 5px 8px;
+    border-radius: 5px;
+    background-color: lightgray;
+}
 .btn-style {
     transition: box-shadow 0.2s, border 0.2s, background 0.2s, opacity 0.2s;
 }
@@ -355,7 +362,6 @@
 .minimal-bubble {
     border-radius: 10px;
     box-shadow: none;
-    background: transparent;
     display: flex;
     align-items: center;
     gap: 0.4rem;
