@@ -188,12 +188,10 @@ export class AiInterviewComponent implements OnInit {
    * Cycles the recording state: Start -> Pause -> Resume -> Stop (on error/external stop).
    */
   toggleRecording(): void {
-    if (this.activeInputMode() === 'code') return; // Ignore if in code mode
 
-    // When user clicks button, stop any AI speech
+    // Always switch to speech mode and start recording when mic is clicked
+    this.activeInputMode.set('speech');
     this.speechService.stopSpeaking();
-
-    // Toggle mic state
     if (this.isRecordingActive) {
       this.pauseRecording();
     } else {
@@ -359,21 +357,24 @@ export class AiInterviewComponent implements OnInit {
     }
   }
   setInputMode(mode: InputMode): void {
-    if (this.activeInputMode() === mode) {
-      // Optional: Toggle back to speech if the same button is clicked
+    // Only one input mode can be active at a time
+    // If the selected mode is already active, revert to 'speech' mode
+    const currentMode = this.activeInputMode();
+    if (currentMode === mode) {
       this.activeInputMode.set('speech');
       this.startRecording();
-    } else {
-      this.activeInputMode.set(mode);
+      return;
+    }
 
-      // When switching *away* from speech, pause the continuous mic.
-      if (mode !== 'speech') {
-        this.speechService.pauseRecording();
-        this.isRecordingActive = false;
-      } else {
-        // When switching *to* speech, resume the continuous mic.
-        this.startRecording();
-      }
+    // Set the selected mode as active
+    this.activeInputMode.set(mode);
+
+    // Handle recording state based on mode
+    if (mode === 'speech') {
+      this.startRecording();
+    } else {
+      this.speechService.pauseRecording();
+      this.isRecordingActive = false;
     }
   }
   
@@ -396,6 +397,8 @@ export class AiInterviewComponent implements OnInit {
       // Show 'code' as string in UI, but push actual code to array
       this.conversationHistory.push({ speaker: 'user', text: 'code submitted' });
       this.processUserResponse(response);
+        // Switch off code mode after submit
+        this.activeInputMode.set('speech');
     } else {
       response = this.userTranscript();
       // Speech mode already handled elsewhere

@@ -218,7 +218,6 @@
         <div class="control-group center vertical-controls">
           <!-- Mic Button -->
           <button class="btn btn-style btn-mic" (click)="toggleRecording()"
-            [disabled]="aiSpeaking() || activeInputMode() !== 'speech'"
             [class.active]="isRecordingActive && activeInputMode() === 'speech'">
             <span class="icon-mic">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -228,7 +227,9 @@
                 <rect x="12" y="24" width="8" height="2" rx="1" fill="#fff" />
               </svg>
             </span>
-            <span *ngIf="activeInputMode() === 'speech'" class="icon-tooltip">Mic On</span>
+            <span *ngIf="activeInputMode() === 'speech'" class="icon-tooltip">
+              {{ isRecordingActive ? 'Mic is On' : 'Mic is Off' }}
+            </span>
           </button>
 
           <!-- Keyboard Button -->
@@ -246,7 +247,9 @@
                 <rect x="12" y="18" width="8" height="2" rx="1" fill="#7E57C2" />
               </svg>
             </span>
-            <span *ngIf="activeInputMode() === 'text'" class="icon-tooltip">Text Mode On</span>
+            <span class="icon-tooltip">
+              {{ activeInputMode() === 'text' ? 'Text Mode On' : 'Text Mode Off' }}
+            </span>
           </button>
 
           <!-- Code Button -->
@@ -261,7 +264,9 @@
                 <rect x="18" y="17" width="7" height="2.5" rx="1" fill="#fff" />
               </svg>
             </span>
-            <span *ngIf="activeInputMode() === 'code'" class="icon-tooltip">Code Mode On</span>
+            <span class="icon-tooltip">
+              {{ activeInputMode() === 'code' ? 'Code Mode On' : 'Code Mode Off' }}
+            </span>
           </button>
         </div>
 

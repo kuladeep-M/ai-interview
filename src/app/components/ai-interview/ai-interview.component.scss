@@ -177,8 +177,11 @@
 }
 
 .btn-mic.active {
-    box-shadow: 0 4px 16px rgba(236, 64, 122, 0.18);
-    box-shadow: 0 0 12px 2px #d40754;
+    border: 3px solid #d40754;
+    box-shadow: 0 0 18px 6px #d40754a0;
+    background-color: #d40754 !important;
+    color: #fff;
+    transition: box-shadow 0.2s, border 0.2s, background 0.2s;
 }
 
 .btn-text-mode.active {
