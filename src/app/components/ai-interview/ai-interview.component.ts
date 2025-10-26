@@ -212,7 +212,16 @@ export class AiInterviewComponent implements OnInit {
     // Start timer when interview screen loads
     this.timerSeconds.set(0);
     this.timerInterval = setInterval(() => {
-      this.timerSeconds.update((s) => s + 1);
+      this.timerSeconds.update((s) => {
+        // If timer reaches 30 minutes (1800 seconds), end interview
+        if (s + 1 >= 1800) {
+          clearInterval(this.timerInterval);
+          this.timerInterval = null;
+          this.onEndInterview();
+          return 1800;
+        }
+        return s + 1;
+      });
     }, 1000);
 
     // Prevent duplicate API calls for new users
@@ -233,8 +242,8 @@ export class AiInterviewComponent implements OnInit {
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
           await this.speechService.speak(spokenText, 'en-IN');
           if (this.activeInputMode() === 'speech') {
-            this.speechService.startRecording();
             this.isRecordingActive = true;
+            this.speechService.startRecording();
           }
         },
         error: (err) => {
