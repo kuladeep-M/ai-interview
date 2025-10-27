@@ -229,6 +229,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   }
 
   onLanguageChange(event: Event): void {
+    this.codeEditorContent = "// New code template";
     const select = event.target as HTMLSelectElement;
     this.selectedLanguage = select.value;
     if ((window as any).monaco && (window as any).monaco.editor) {
