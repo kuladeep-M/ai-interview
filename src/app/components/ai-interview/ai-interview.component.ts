@@ -136,8 +136,7 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked {
           await this.speechService.speak(spokenText, 'en-IN');
           if (this.activeInputMode() === 'speech') {
             setTimeout(() => {
-              this.speechService.startRecording();
-              this.isRecordingActive = true;
+              this.startRecording();
             }, 300);
           }
         },
@@ -161,21 +160,20 @@ You are an AI Interviewer.
 Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
 Begin by greeting the candidate warmly and then start the interview with your first question.`;
       this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
-        next: async (aiResponse: string) => {
+        next: async (aiResponse: {response: string}) => {
           let responseText = '';
           try {
-            const parsed = JSON.parse(aiResponse);
-            responseText = parsed.response || '';
+            const parsed = JSON.parse(aiResponse?.response);
+            responseText = parsed.message || '';
           } catch {
-            responseText = aiResponse;
+            responseText = 'something went wrong';
           }
           this.conversationHistory.push({ speaker: 'ai', text: responseText });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
           await this.speechService.speak(spokenText, 'en-IN');
           if (this.activeInputMode() === 'speech') {
             setTimeout(() => {
-              this.speechService.startRecording();
-              this.isRecordingActive = true;
+              this.startRecording();
             }, 300);
           }
         },
@@ -318,13 +316,13 @@ Begin by greeting the candidate warmly and then start the interview with your fi
             return this.aiStreamService.sendMessageToModel(combined);
           })
         ).subscribe({
-          next: async (aiResponse: string) => {
+          next: async (aiResponse: {response: string}) => {
             let responseText = '';
             try {
-              const parsed = JSON.parse(aiResponse);
-              responseText = parsed.response || '';
+              const parsed = JSON.parse(aiResponse.response);
+              responseText = parsed.message || '';
             } catch {
-              responseText = aiResponse;
+              responseText = "something went wrong";
             }
             this.aiInFlight = false;
             setTimeout(() => {
