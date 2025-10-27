@@ -212,6 +212,8 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   onEndInterview(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'End Interview', content: 'End interview' });
     this.aiStreamService.sendUserMessage('End Interview');
+    this.speechService.stopSpeaking();
+    this.speechService.stopRecording();
     this.aiStreamService.storeHistory(this.conversationHistory);
     this.userService.clearSessionId();
     this.userService.clearUser();
