@@ -1,4 +1,4 @@
-<div class="hr-dashboard-container" *ngIf="interviews && interviews.length > 0">
+<div class="hr-dashboard-container" *ngIf="interviews() && interviews().length > 0">
   <aside class="sidebar">
     <h2>HR Dashboard</h2>
     <nav>
@@ -14,11 +14,11 @@
   <section class="main-panel">
     <div class="recent-interviews">
       <h3>Recent Interviews</h3>
-      <span class="subtitle">{{ interviews.length }} interviews today</span>
+      <span class="subtitle">{{ interviews().length }} interviews today</span>
       <ul class="interview-list">
-        <li *ngFor="let interview of interviews; let i = index" class="interview-card"
-          [class.selected]="selectedInterview && interview.id === selectedInterview.id"
-          (click)="selectedInterview = interview">
+        <li *ngFor="let interview of interviews(); let i = index" class="interview-card"
+          [class.selected]="selectedInterview() && interview.id === selectedInterview()?.id"
+          (click)="selectedInterview.set(interview)">
           <div class="avatar" [ngStyle]="getAvatarStyle(interview.name)">{{ getInitial(interview.name) }}</div>
           <div class="details">
             <div class="name">{{ interview.name }}</div>
@@ -39,32 +39,32 @@
         <div class="avatar large" [ngStyle]="getAvatarStyle(selectedInterview.name)" style="font-size:2rem;">{{
           getInitial(selectedInterview.name) }}</div>
         <div class="profile-info">
-          <div class="name">{{ selectedInterview.name }}</div>
-          <div class="role">{{ selectedInterview.role }}</div>
-          <div class="meta">Interview: {{ selectedInterview.interviewTime }}</div>
+          <div class="name">{{ selectedInterview()?.name }}</div>
+          <div class="role">{{ selectedInterview()?.role }}</div>
+          <div class="meta">Interview: {{ selectedInterview()?.interviewTime }}</div>
         </div>
         <div class="fit-score">
           <span class="label">AI Fit Score</span>
-          <div class="score success">{{ selectedInterview.score }}%</div>
+          <div class="score success">{{ selectedInterview()?.score }}%</div>
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat"><span>{{ selectedInterview.duration }}</span>
+        <div class="stat"><span>{{ selectedInterview()?.duration }}</span>
           <div>Duration</div>
         </div>
-        <div class="stat"><span>{{ selectedInterview.questionsAnswered }}</span>
+        <div class="stat"><span>{{ selectedInterview()?.questionsAnswered }}</span>
           <div>Questions Answered</div>
         </div>
-        <div class="stat"><span>{{ selectedInterview.confidenceLevel }}</span>
+        <div class="stat"><span>{{ selectedInterview()?.confidenceLevel }}</span>
           <div>Confidence Level</div>
         </div>
-        <div class="stat"><span>{{ selectedInterview.domainScore }}</span>
+        <div class="stat"><span>{{ selectedInterview()?.domainScore }}</span>
           <div>Domain Score</div>
         </div>
       </div>
       <div class="overall-summary">
         <h4>Overall Summary</h4>
-        <p>{{ selectedInterview.overallSummary }}</p>
+        <p>{{ selectedInterview()?.overallSummary }}</p>
       </div>
     </div>
   </section>

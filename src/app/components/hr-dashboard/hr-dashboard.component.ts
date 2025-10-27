@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { AIStreamService } from '../../services/ai-stream.service';
 
 
@@ -25,16 +25,16 @@ export interface InterviewDetail {
   imports: [CommonModule]
 })
 export class HrDashboardComponent implements OnInit {
-  
-  interviews: InterviewDetail[] = [];
-  selectedInterview: InterviewDetail | null = null;
+
+  interviews: WritableSignal<InterviewDetail[]> = signal([]);
+  selectedInterview: WritableSignal<InterviewDetail | null> = signal(null);
   constructor(private aiService: AIStreamService,private cdr: ChangeDetectorRef) {
     
   }
   ngOnInit(): void {
    this.aiService.getInterviewData().subscribe((data: any) => {
       if (data && typeof data === 'object') {
-        this.interviews = Object.entries(data).map(([id, entry]: [string, any], idx) => {
+        this.interviews.set(Object.entries(data).map(([id, entry]: [string, any], idx) => {
           // Parse response if present
           let parsed = entry;
           if (typeof entry.response === 'string') {
@@ -61,10 +61,10 @@ export class HrDashboardComponent implements OnInit {
             avatarClass: 'avatar-default',
             overallSummary: parsed.feedback || 'No summary available.'
           };
-        });
+        }));
         console.log('Loaded interviews:', this.interviews);
-        this.selectedInterview = this.interviews.length > 0 ? this.interviews[0] : null;
-        this.cdr.detectChanges();
+        this.selectedInterview.set(this.interviews().length > 0 ? this.interviews()[0] : null);
+        //this.cdr.detectChanges();
       }
     });
   }
