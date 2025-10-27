@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AIStreamService } from '../../services/ai-stream.service';
 
 
@@ -24,10 +24,15 @@ export interface InterviewDetail {
   standalone: true,
   imports: [CommonModule]
 })
-export class HrDashboardComponent  {
+export class HrDashboardComponent implements OnInit {
   
-  constructor(private aiService: AIStreamService) {
-    this.aiService.getInterviewData().subscribe((data: any) => {
+  interviews: InterviewDetail[] = [];
+  selectedInterview: InterviewDetail | null = null;
+  constructor(private aiService: AIStreamService,private cdr: ChangeDetectorRef) {
+    
+  }
+  ngOnInit(): void {
+   this.aiService.getInterviewData().subscribe((data: any) => {
       if (data && typeof data === 'object') {
         this.interviews = Object.entries(data).map(([id, entry]: [string, any], idx) => {
           // Parse response if present
@@ -58,13 +63,13 @@ export class HrDashboardComponent  {
           };
         });
         console.log('Loaded interviews:', this.interviews);
+        this.selectedInterview = this.interviews.length > 0 ? this.interviews[0] : null;
+        this.cdr.detectChanges();
       }
     });
   }
 
 
-  interviews: InterviewDetail[] = [];
-  selectedInterview: InterviewDetail | null = null;
 getInitial(name: string): string {
     return name ? name.charAt(0).toUpperCase() : '';
   }
