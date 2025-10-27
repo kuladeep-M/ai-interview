@@ -1,9 +1,9 @@
 
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, AfterViewChecked, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, AfterViewChecked, signal, WritableSignal, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, Subject, switchMap } from 'rxjs';
-import { VoiceService } from '../../services/voice.service';
+import { VoiceService } from '../../services/speech.service';
 import { AIStreamService } from '../../services/ai-stream.service';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { FormsModule } from '@angular/forms';
@@ -18,8 +18,9 @@ export type InputMode = 'speech' | 'text' | 'code';
   templateUrl: './ai-interview.component.html',
   styleUrls: ['./ai-interview.component.scss'],
 })
-export class AiInterviewComponent implements OnInit, AfterViewChecked {
+export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy {
   ngOnDestroy(): void {
+    this.speechService.stopRecording();
     this.speechService.stopSpeaking();
   }
   ngAfterViewChecked(): void {
@@ -45,7 +46,7 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked {
   public showAISpeakingText: WritableSignal<boolean> = signal(true);
   public showUserSpeakingText: WritableSignal<boolean> = signal(true);
   public liveTranscript: WritableSignal<string> = signal('');
-  public conversationHistory: { speaker: 'user' | 'ai', text: string }[] = [];
+  public conversationHistory: { speaker: 'user' | 'ai', text: string, content: any }[] = [];
   public userTranscript: WritableSignal<string> = signal('Press mic to start speaking.');
   public aiSpeaking: WritableSignal<boolean> = signal(false);
   public isRecordingActive = false;
@@ -118,11 +119,10 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked {
         job_role: user?.role,
         experience_level: user?.experienceLevel,
         interview_duration: user?.interviewDuration,
-        command: "I'm back, resume the interview.",
         job_description: ''
       };
 
-      this.aiStreamService.sendMessageToModel(JSON.stringify(payload, null, 2)).subscribe({
+      this.aiStreamService.sendMessageToModel("I'm back, resume the interview.",JSON.stringify(payload, null, 2)).subscribe({
         next: async (aiResponse: {response: string}) => {
           let responseText = '';
           try {
@@ -131,14 +131,15 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked {
           } catch {
             responseText = 'something went wrong';
           }
-          this.conversationHistory.push({ speaker: 'ai', text: responseText });
+          this.conversationHistory.push({ speaker: 'ai', text: responseText, content: aiResponse.response });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
-          await this.speechService.speak(spokenText, 'en-IN');
-          if (this.activeInputMode() === 'speech') {
-            setTimeout(() => {
-              this.startRecording();
-            }, 300);
-          }
+          this.speechService.speak(spokenText, 'en-IN').then(() => {
+            if (this.activeInputMode() === 'speech') {
+              setTimeout(() => {
+                this.startRecording();
+              }, 300);
+            }
+          });
         },
         error: (err) => {
           console.error('AI model error:', err);
@@ -150,7 +151,6 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked {
         job_role: user.role,
         experience_level: user.experienceLevel,
         interview_duration: user.interviewDuration,
-        command: "Start Interview",
         job_description: ''
       };
       const firstMessage = `
@@ -159,8 +159,8 @@ ${JSON.stringify(payload, null, 2)}
 You are an AI Interviewer.
 Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
 Begin by greeting the candidate warmly and then start the interview with your first question.`;
-      this.aiStreamService.sendMessageToModel(firstMessage).subscribe({
-        next: async (aiResponse: {response: string}) => {
+      this.aiStreamService.sendMessageToModel("Start Interview",firstMessage).subscribe({
+        next:  (aiResponse: {response: string}) => {
           let responseText = '';
           try {
             const parsed = JSON.parse(aiResponse?.response);
@@ -168,14 +168,15 @@ Begin by greeting the candidate warmly and then start the interview with your fi
           } catch {
             responseText = 'something went wrong';
           }
-          this.conversationHistory.push({ speaker: 'ai', text: responseText });
+          this.conversationHistory.push({ speaker: 'ai', text: responseText,content: aiResponse.response });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
-          await this.speechService.speak(spokenText, 'en-IN');
-          if (this.activeInputMode() === 'speech') {
-            setTimeout(() => {
-              this.startRecording();
-            }, 300);
-          }
+          this.speechService.speak(spokenText, 'en-IN').then(() => {
+            if (this.activeInputMode() === 'speech') {
+              setTimeout(() => {
+                this.startRecording();
+              }, 300);
+            }
+          });
         },
         error: (err) => {
           console.error('AI model error:', err);
@@ -209,15 +210,16 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   }
 
   onEndInterview(): void {
-    this.conversationHistory.push({ speaker: 'user', text: 'End Interview' });
+    this.conversationHistory.push({ speaker: 'user', text: 'End Interview', content: 'End interview' });
     this.aiStreamService.sendUserMessage('End Interview');
     this.userService.clearSessionId();
     this.userService.clearUser();
+    console.log(this.conversationHistory);
     this.router.navigate(['/thank-you']);
   }
 
   onPassSkip(): void {
-    this.conversationHistory.push({ speaker: 'user', text: 'skip this question' });
+    this.conversationHistory.push({ speaker: 'user', text: 'skip this question', content: 'skip this question' });
     this.processUserResponse('skip this question');
   }
 
@@ -281,13 +283,13 @@ Begin by greeting the candidate warmly and then start the interview with your fi
     if (this.activeInputMode() === 'text') {
       response = this.userTranscriptValue;
       this.userTranscript.set(response);
-      this.conversationHistory.push({ speaker: 'user', text: response });
+      this.conversationHistory.push({ speaker: 'user', text: response, content: response });
       this.processUserResponse(response);
       this.userTranscriptValue = '';
     } else if (this.activeInputMode() === 'code') {
       response = this.codeEditorContent;
       console.log('[DEBUG] Code submitted:', response);
-      this.conversationHistory.push({ speaker: 'user', text: 'code submitted' });
+      this.conversationHistory.push({ speaker: 'user', text: 'code submitted', content: response });
       this.processUserResponse(response);
       this.activeInputMode.set('speech');
     } else {
@@ -326,8 +328,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               responseText = "something went wrong";
             }
             this.aiInFlight = false;
-            setTimeout(() => {
-              this.conversationHistory.push({ speaker: 'ai', text: responseText });
+              this.conversationHistory.push({ speaker: 'ai', text: responseText, content: aiResponse.response });
               const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
               this.speechService.speak(spokenText, 'en-IN').then(() => {
                 if (this.activeInputMode() === 'speech') {
@@ -337,12 +338,61 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               });
               this.lastProcessedIndex = 0;
               this.aiBuffer = [];
-            }, 0);
           },
           error: (err) => {
             console.error('AI model error:', err);
             this.aiInFlight = false;
           },
+          complete: () => {
+            // If there are still buffered messages, process them
+            if (this.aiBuffer.length > 0) {
+              const unsentMessages = this.aiBuffer.slice(this.lastProcessedIndex);
+              if (unsentMessages.length > 0) {
+                const combined = unsentMessages.join(' ');
+                this.lastProcessedIndex = this.aiBuffer.length;
+                this.aiInFlight = true;
+                if (this.isRecordingActive) {
+                  this.speechService.pauseRecording();
+                  this.isRecordingActive = false;
+                }
+                this.aiStreamService.sendMessageToModel(combined).subscribe({
+                  next: async (aiResponse: {response: string}) => {
+                    let responseText = '';
+                    try {
+                      const parsed = JSON.parse(aiResponse.response);
+                      responseText = parsed.message || '';
+                    } catch {
+                      responseText = "something went wrong";
+                    }
+                    this.aiInFlight = false;
+                    setTimeout(() => {
+                      this.conversationHistory.push({ speaker: 'ai', text: responseText , content: aiResponse.response  });
+                      const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+                      this.speechService.speak(spokenText, 'en-IN').then(() => {
+                        if (this.activeInputMode() === 'speech') {
+                          this.speechService.startRecording();
+                          this.isRecordingActive = true;
+                        }
+                      });
+                      this.lastProcessedIndex = 0;
+                      this.aiBuffer = [];
+                    }, 0);
+                  },
+                  error: (err) => {
+                    console.error('AI model error:', err);
+                    this.aiInFlight = false;
+                  },
+                  complete: () => {
+                    this.aiInFlight = false;
+                  }
+                });
+              } else {
+                this.aiInFlight = false;
+              }
+            } else {
+              this.aiInFlight = false;
+            }
+          }
         });
         this.aiRequestSubject.next('');
       } else {
@@ -409,7 +459,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               this.transcriptQueue.push(finalSegment);
               this.userTranscript.set(this.finalTranscriptSegments.join(' '));
               this.lastTranscriptChunk = this.finalTranscriptSegments.join(' ');
-              this.conversationHistory.push({ speaker: 'user', text: finalSegment });
+              this.conversationHistory.push({ speaker: 'user', text: finalSegment , content: finalSegment });
               this.interimTranscriptBuffer = '';
               this.liveTranscript.set('');
               this.userSpeakingIndicator.set(true);
@@ -427,6 +477,8 @@ Begin by greeting the candidate warmly and then start the interview with your fi
         
           this.silenceTimeout = setTimeout(() => {
             if (this.transcriptQueue.length > 0) {
+              // Clear live transcript immediately when processing
+              this.liveTranscript.set('');
               const combined = this.transcriptQueue.join(' ');
               this.userTranscript.set(combined);
               this.processUserResponse(combined);
@@ -440,6 +492,10 @@ Begin by greeting the candidate warmly and then start the interview with your fi
           console.error('Recording error:', err);
           this.stopRecording();
         },
+        complete: () => {
+          // Optionally handle completion, e.g., cleanup
+          this.stopRecording();
+        }
       });
     }
     this.speechService.startRecording();

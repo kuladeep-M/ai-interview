@@ -5,6 +5,7 @@ import { NEVER, Observable, repeat, retry, share, Subject, switchMap } from 'rxj
 import {
   SPEECH_SYNTHESIS_VOICES,
   SpeechRecognitionService,
+  takeUntilSaid,
 } from '@ng-web-apis/speech';
 
 @Injectable({ providedIn: 'root' })
@@ -35,7 +36,7 @@ export class VoiceService implements OnDestroy {
   get record$() {
     return this.recordingTrigger$.pipe(
       // switchMap is CRITICAL: when trigger is TRUE, switch to mic stream; when FALSE, switch to NEVER (stops emitting)
-      switchMap(isRecording => isRecording ? this.recognition$ : NEVER),
+      switchMap(isRecording => isRecording ? this.recognition$.pipe(takeUntilSaid('done'),takeUntilSaid("that's it")) : NEVER),
       // The value 'text' here is already a string, so no need for map((m) => m.transcript)
     );
   }
@@ -71,15 +72,13 @@ export class VoiceService implements OnDestroy {
       } else {
         utter.lang = 'en-US';
       }
-      utter.rate = 0.85; // Reduce voice speed
+      utter.rate = 0.90; // Reduce voice speed
       utter.onend = () => {
         this.isSpeakingSubject.next(false);
         resolve();
       };
-      setTimeout(() => {
-        this.synthesis.speak(utter);
-        console.log('speakinggg')
-      }, 120);
+      this.synthesis.speak(utter);
+      
     });
   }
 

@@ -14,8 +14,8 @@ export class AIStreamService {
     private userService: UserService
   ) {}
 
-  public sendMessageToModel(message: string): Observable<any> {
-    console.log('Sending message to model:', message);
+  public sendMessageToModel(chatMessage: string,contex?: any): Observable<any> {
+    console.log('Sending message to model:', chatMessage);
     let sessionId = this.userService?.sessionId;
     if (!sessionId) {
       sessionId = uuidv4();
@@ -29,7 +29,7 @@ export class AIStreamService {
       system_prompt_variables: {},
       agent_id: '68f951b6058210757bf615af',
       session_id: sessionId,
-      message
+      message:JSON.stringify({ role: "user", context: contex || {}, message: chatMessage })
     };
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

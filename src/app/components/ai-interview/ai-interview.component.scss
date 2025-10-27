@@ -631,8 +631,7 @@ button svg,
 
 /* AI Question Block */
 .ai-question-block {
-    display: flex;
-    gap: 15px;
+   height: 400px;
 }
 .time-limit{
     color: red;
@@ -654,7 +653,8 @@ button svg,
     background-color: white;
     padding: 20px;
     border-radius: 10px;
-    flex-grow: 1;
+    width: 100%;
+    min-height: 200px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
