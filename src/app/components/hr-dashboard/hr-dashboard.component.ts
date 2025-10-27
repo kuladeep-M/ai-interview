@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-
+import { AIStreamService } from '../../services/ai-stream.service';
 
 
 export interface InterviewDetail {
@@ -12,12 +12,8 @@ export interface InterviewDetail {
   duration: string;
   questionsAnswered: string;
   confidenceLevel: string;
-  technicalScore: string;
-  qa: Array<{
-    question: string;
-    answer: string;
-    aiFeedback?: string;
-  }>;
+  domainScore: string;
+  overallSummary: string;
   avatarClass: string;
 }
 
@@ -28,105 +24,48 @@ export interface InterviewDetail {
   standalone: true,
   imports: [CommonModule]
 })
-export class HrDashboardComponent implements OnInit {
-  interviews :InterviewDetail[] = [
-    {
-      id: 1,
-      name: 'Sarah Chen',
-      role: 'Senior Frontend Developer',
-      interviewTime: 'Oct 23, 2024 at 2:30 PM',
-      score: 92,
-      duration: '45m',
-      questionsAnswered: '12/15',
-      confidenceLevel: 'High',
-      technicalScore: '89%',
-      avatarClass: 'avatar-sarah',
-      qa: [
-        {question: 'Tell me about yourself.', answer: 'I am a frontend developer with 5 years of experience...', aiFeedback: 'Good introduction, but could include more about specific skills.'},
-        {question: 'Describe a challenging project you worked on.', answer: 'I led a migration from AngularJS to Angular 12...', aiFeedback: 'Strong leadership, mention technical hurdles.'},
-        {question: 'How do you ensure code quality?', answer: 'I use unit tests, code reviews, and linters...', aiFeedback: 'Good practices, could mention CI/CD.'}
-      ]
-    },
-    {
-      id: 2,
-      name: 'Michael Torres',
-      role: 'Backend Engineer',
-      interviewTime: 'Oct 23, 2024 at 1:00 PM',
-      score: 76,
-      duration: '40m',
-      questionsAnswered: '10/15',
-      confidenceLevel: 'Medium',
-      technicalScore: '75%',
-      avatarClass: 'avatar-michael',
-      qa: [
-        {question: 'What is RESTful API?', answer: 'RESTful API is an architectural style for designing networked applications...', aiFeedback: 'Clear explanation, but could mention examples.'},
-        {question: 'How do you handle database migrations?', answer: 'I use tools like Flyway and Liquibase...', aiFeedback: 'Good, mention rollback strategies.'},
-        {question: 'Explain error handling in Node.js.', answer: 'I use try-catch blocks and error middleware...', aiFeedback: 'Solid, could discuss logging.'}
-      ]
-    },
-    {
-      id: 3,
-      name: 'Emma Rodriguez',
-      role: 'UX Designer',
-      interviewTime: 'Oct 23, 2024 at 11:30 AM',
-      score: 88,
-      duration: '50m',
-      questionsAnswered: '14/15',
-      confidenceLevel: 'High',
-      technicalScore: '85%',
-      avatarClass: 'avatar-emma',
-      qa: [
-        {question: 'How do you approach user research?', answer: 'I start by identifying target users and conducting interviews...', aiFeedback: 'Comprehensive approach, well done.'},
-        {question: 'Describe your design process.', answer: 'I follow a user-centered design process...', aiFeedback: 'Clear steps, could mention prototyping.'},
-        {question: 'How do you handle feedback?', answer: 'I collect feedback through surveys and usability tests...', aiFeedback: 'Good, mention iteration.'}
-      ]
-    },
-    {
-      id: 4,
-      name: 'David Kim',
-      role: 'DevOps Engineer',
-      interviewTime: 'Oct 23, 2024 at 10:00 AM',
-      score: 54,
-      duration: '30m',
-      questionsAnswered: '8/15',
-      confidenceLevel: 'Low',
-      technicalScore: '60%',
-      avatarClass: 'avatar-david',
-      qa: [
-        {question: 'Explain CI/CD.', answer: 'CI/CD stands for Continuous Integration and Continuous Deployment...', aiFeedback: 'Basic understanding, could elaborate more.'},
-        {question: 'How do you monitor production systems?', answer: 'I use Prometheus and Grafana for monitoring...', aiFeedback: 'Good, could mention alerting.'},
-        {question: 'Describe your experience with Docker.', answer: 'I build and deploy containers for microservices...', aiFeedback: 'Solid, could discuss orchestration.'}
-      ]
-    }
-  ]
+export class HrDashboardComponent  {
+  
+  constructor(private aiService: AIStreamService) {
+    this.aiService.getInterviewData().subscribe((data: any) => {
+      if (data && typeof data === 'object') {
+        this.interviews = Object.entries(data).map(([id, entry]: [string, any], idx) => {
+          // Parse response if present
+          let parsed = entry;
+          if (typeof entry.response === 'string') {
+            try {
+              parsed = { ...entry, ...JSON.parse(entry.response) };
+            } catch {}
+          }
+          // Try to get userData if present
+          const userData = parsed.userData || {};
+          console.log('Parsed interview entry:', parsed);
+          // Defensive: ensure domain_score and generic_score are numbers
+          const domainScore = typeof parsed.domain_evaluation?.domain_score === 'number' ? parsed.domain_evaluation.domain_score : Number(parsed.domain_evaluation?.domain_score) || 0;
+          
+          return {
+            id: idx + 1,
+            name: userData.name || parsed.candidate_name || 'Unknown',
+            role: userData.role || parsed.domain_evaluation?.domain_name || parsed.job_role || 'Unknown',
+            interviewTime: parsed.created_date || 'Unknown',
+            score: Math.round((parsed.overall_score || 0) * 10),
+            duration: userData.interviewDuration || parsed.duration || 'N/A',
+            questionsAnswered: parsed.questionsAnswered || 'N/A',
+            confidenceLevel: parsed.confidence_level ? (parsed.confidence_level > 0.8 ? 'High' : parsed.confidence_level > 0.5 ? 'Medium' : 'Low') : 'N/A',
+            domainScore: domainScore !== undefined ? `${domainScore * 10}%` : 'N/A',
+            avatarClass: 'avatar-default',
+            overallSummary: parsed.feedback || 'No summary available.'
+          };
+        });
+        console.log('Loaded interviews:', this.interviews);
+      }
+    });
+  }
 
+
+  interviews: InterviewDetail[] = [];
   selectedInterview: InterviewDetail | null = null;
-
-  ngOnInit() {
-    // Set default selected interview
-    this.selectedInterview = this.getInterviewDetail(this.interviews[0].id);
-  }
-
-  getInterviewDetail(id: number): InterviewDetail | null {
-    const interview = this.interviews.find(interview => interview.id === id);
-    if (!interview) return null;
-
-    return {
-      id: interview.id,
-      name: interview.name,
-      role: interview.role,
-      interviewTime: interview.interviewTime,
-      score: interview.score,
-      duration: interview.duration,
-      questionsAnswered: interview.questionsAnswered,
-      confidenceLevel: interview.confidenceLevel,
-      technicalScore: interview.technicalScore,
-      avatarClass: interview.avatarClass,
-      qa: interview.qa
-    };
-  }
-
-  getInitial(name: string): string {
+getInitial(name: string): string {
     return name ? name.charAt(0).toUpperCase() : '';
   }
   getAvatarStyle(name: string): any {

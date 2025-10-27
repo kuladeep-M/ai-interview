@@ -16,7 +16,9 @@
       <h3>Recent Interviews</h3>
       <span class="subtitle">{{ interviews.length }} interviews today</span>
       <ul class="interview-list">
-        <li *ngFor="let interview of interviews; let i = index" class="interview-card" [class.selected]="selectedInterview && interview.name === selectedInterview.name" (click)="selectedInterview = getInterviewDetail(interview.id)">
+        <li *ngFor="let interview of interviews; let i = index" class="interview-card"
+          [class.selected]="selectedInterview && interview.id === selectedInterview.id"
+          (click)="selectedInterview = interview">
           <div class="avatar" [ngStyle]="getAvatarStyle(interview.name)">{{ getInitial(interview.name) }}</div>
           <div class="details">
             <div class="name">{{ interview.name }}</div>
@@ -34,7 +36,8 @@
 
     <div class="interview-details" *ngIf="selectedInterview">
       <div class="profile-header">
-        <div class="avatar large" [ngStyle]="getAvatarStyle(selectedInterview.name)" style="font-size:2rem;">{{ getInitial(selectedInterview.name) }}</div>
+        <div class="avatar large" [ngStyle]="getAvatarStyle(selectedInterview.name)" style="font-size:2rem;">{{
+          getInitial(selectedInterview.name) }}</div>
         <div class="profile-info">
           <div class="name">{{ selectedInterview.name }}</div>
           <div class="role">{{ selectedInterview.role }}</div>
@@ -46,18 +49,22 @@
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat"><span>{{ selectedInterview.duration }}</span><div>Duration</div></div>
-        <div class="stat"><span>{{ selectedInterview.questionsAnswered }}</span><div>Questions Answered</div></div>
-        <div class="stat"><span>{{ selectedInterview.confidenceLevel }}</span><div>Confidence Level</div></div>
-        <div class="stat"><span>{{ selectedInterview.technicalScore }}</span><div>Technical Score</div></div>
-      </div>
-      <div class="qa-section">
-        <h4>Interview Q&amp;A with AI Feedback</h4>
-        <div *ngFor="let qa of selectedInterview.qa" class="qa-block">
-          <div class="question">Q: <span>{{ qa.question }}</span></div>
-          <div class="answer">{{ qa.answer }}</div>
-          <div *ngIf="qa.aiFeedback" class="ai-feedback success">AI Feedback: {{ qa.aiFeedback }}</div>
+        <div class="stat"><span>{{ selectedInterview.duration }}</span>
+          <div>Duration</div>
         </div>
+        <div class="stat"><span>{{ selectedInterview.questionsAnswered }}</span>
+          <div>Questions Answered</div>
+        </div>
+        <div class="stat"><span>{{ selectedInterview.confidenceLevel }}</span>
+          <div>Confidence Level</div>
+        </div>
+        <div class="stat"><span>{{ selectedInterview.domainScore }}</span>
+          <div>Domain Score</div>
+        </div>
+      </div>
+      <div class="overall-summary">
+        <h4>Overall Summary</h4>
+        <p>{{ selectedInterview.overallSummary }}</p>
       </div>
     </div>
   </section>
