@@ -1,59 +1,21 @@
 <div class="interview-page-container">
 
-  <aside class="sidebar-panel" *ngIf="showSidebar">
-    <button class="icon-btn toggle-sidebar-btn" (click)="toggleSidebar()"
-      style="position: absolute; top: 18px; left: 18px; background: none; border: none; cursor: pointer;">
-      <span *ngIf="showSidebar">
-        <!-- Eye-off icon -->
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="10" fill="#eee" />
-          <path d="M4 11c2.5-4 7.5-4 10 0" stroke="#5d5cff" stroke-width="2" fill="none" />
-          <line x1="6" y1="16" x2="16" y2="6" stroke="#d40754" stroke-width="2" />
-        </svg>
-      </span>
-      <span *ngIf="!showSidebar">
-        <!-- Eye icon -->
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="10" fill="#eee" />
-          <path d="M4 11c2.5-4 7.5-4 10 0" stroke="#5d5cff" stroke-width="2" fill="none" />
-          <circle cx="11" cy="11" r="3" fill="#5d5cff" />
-        </svg>
-      </span>
-    </button>
-    <div class="header">
-      <span class="logo">🤖 AI Interview</span>
-      <span class="sub-text">Voice Assistant</span>
+  <div class="header" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 16px 0; position: relative;">
+    <div></div>
+    <div style="display: flex; flex-direction: column; align-items:center;margin-left:110px;">
+      <span class="logo" style="font-size: 2rem; font-weight: 700; letter-spacing: 1px;">🤖 AI Interview</span>
+      <span class="sub-text" style="font-size: 1.1rem; color: #666; margin-top: 4px;">Voice Assistant</span>
     </div>
-    <div class="section-block settings-section">
-      <h3>Settings</h3>
-      <div class="setting-item">
-        <label for="speech-rec">Speech Recognition</label>
-        <input type="checkbox" id="speech-rec" checked>
-      </div>
-      <div class="setting-item">
-        <label for="show-ai-text">Show AI Speaking Text</label>
-        <input type="checkbox" id="show-ai-text" [checked]="showAISpeakingText()"
-          (change)="toggleShowAISpeakingText($event)">
-      </div>
-      <div class="setting-item">
-        <label for="show-user-text">Show User Speaking Text</label>
-        <input type="checkbox" id="show-user-text" [checked]="showUserSpeakingText()"
-          (change)="toggleShowUserSpeakingText($event)">
-      </div>
-      <div class="setting-item">
-        <label for="helper-tools">Helper Tools</label>
-        <input type="checkbox" id="helper-tools">
-      </div>
+    <div class="header-controls" style="display: flex; gap: 16px; align-items: center;margin-right: 15px;">
+      <span class="time-limit">⏱ {{ formattedTimer }}</span>
+      <button class="btn btn-end-interview" (click)="onEndInterview()">🛑 End Interview</button>
     </div>
-    
-  </aside>
+  </div>
 
   <main class="main-content-panel">
     <header class="main-header">
       <h2>Technical Interview</h2>
       <p>Senior Frontend Developer Position</p>
-      <span class="time-limit">⏱ {{ formattedTimer }}</span>
-      <button class="btn btn-end-interview" (click)="onEndInterview()">🛑 End Interview</button>
     </header>
 
     <section class="ai-question-block">
@@ -122,7 +84,7 @@
               </div>
             </div>
             }
-            <div *ngIf="liveTranscript()" class="minimal-bubble user" >
+            <div *ngIf="liveTranscript()" class="minimal-bubble user">
               <div class="avatar minimal-avatar">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="16" cy="20" r="14" fill="#6C63FF" />
@@ -160,8 +122,7 @@
             </select>
           </div>
           <div class="code-editor-wrapper">
-            <ngx-monaco-editor [options]="codeEditorOptions"
-              [(ngModel)]="codeEditorContent"
+            <ngx-monaco-editor [options]="codeEditorOptions" [(ngModel)]="codeEditorContent"
               [model]="{ value: codeEditorContent, language: selectedLanguage }"
               (modelChange)="onCodeEditorChange($event)"
               style="height:300px;width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(44,62,80,0.10);">

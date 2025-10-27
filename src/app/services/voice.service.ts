@@ -20,6 +20,7 @@ export class VoiceService implements OnDestroy {
   readonly isSpeaking$: Observable<boolean> = this.isSpeakingSubject.asObservable();
   private readonly synthesis: SpeechSynthesis = window.speechSynthesis;
   recognition$: Observable<SpeechRecognitionResult[]>;
+  public isRecordingActive: boolean = false;
   constructor(
     @Inject(SPEECH_SYNTHESIS_VOICES)
     readonly voices$: Observable<ReadonlyArray<SpeechSynthesisVoice>>,
@@ -83,16 +84,18 @@ export class VoiceService implements OnDestroy {
   }
 
   startRecording(): void {
-    // 2. Activate the User's recording stream
+    this.isRecordingActive = true;
     this.recordingTrigger$.next(true);
     console.log('listening')
   }
 
   pauseRecording(): void {
+    this.isRecordingActive = false;
     this.recordingTrigger$.next(false);
   }
 
   stopRecording(): void {
+    this.isRecordingActive = false;
     this.recordingTrigger$.next(false);
   }
 
@@ -103,6 +106,7 @@ export class VoiceService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopRecording();
+    this.isRecordingActive = false;
     this.recordingTrigger$.complete();
     this.isSpeakingSubject.complete();
   }

@@ -416,13 +416,13 @@ Begin by greeting the candidate warmly and then start the interview with your fi
       });
     }
     this.speechService.startRecording();
-    this.isRecordingActive = true;
+    this.isRecordingActive = this.speechService.isRecordingActive;
   }
 
   pauseRecording(): void {
     if (!this.recordSubscription || !this.isRecordingActive) return;
     this.speechService.pauseRecording();
-    this.isRecordingActive = false;
+    this.isRecordingActive = this.speechService.isRecordingActive;
   }
 
   stopRecording(): void {
@@ -436,7 +436,18 @@ Begin by greeting the candidate warmly and then start the interview with your fi
       this.silenceTimeout = null;
     }
     this.speechService.stopRecording();
-    this.isRecordingActive = false;
+    this.isRecordingActive = this.speechService.isRecordingActive;
+  }
+
+  toggleRecording(): void {
+    this.activeInputMode.set('speech');
+    this.speechService.stopSpeaking();
+    if (this.speechService.isRecordingActive) {
+      this.speechService.stopRecording();
+    } else {
+      this.speechService.startRecording();
+    }
+    this.isRecordingActive = this.speechService.isRecordingActive;
   }
 
   getAiMessageParts(text: string): { question: string, rest: string, code: string } {

@@ -423,7 +423,6 @@
 
 /* --- Global Reset and Main Layout --- */
 .interview-page-container {
-    display: flex;
     /* Sets the main layout to have the sidebar and main content side-by-side */
     min-height: 100vh;
     background-color: #f4f7f9;
@@ -593,10 +592,13 @@
     display: flex;
     gap: 15px;
 }
-
+.time-limit{
+    color: red;
+    font-weight: 700;
+}
 .ai-avatar {
-    width: 40px;
-    height: 40px;
+    min-width:50px;
+    height: 48px;
     background-color: #5d5cff;
     color: white;
     border-radius: 50%;
