@@ -1,3 +1,45 @@
+/* Make all SVG icons in buttons show pointer cursor */
+button svg,
+.btn-style svg,
+.btn-mic svg,
+.btn-text-mode svg,
+.btn-code svg,
+.btn-end-interview svg,
+.icon-mic svg,
+.icon-text svg,
+.icon-code svg,
+.icon-submit svg {
+    cursor: pointer;
+}
+/* AI Typing Bubble Animations */
+.ai-typing-bubble {
+    animation: fadeInBubble 0.5s, pulseBubble 1.2s infinite alternate;
+}
+.ai-typing-bubble .typing-dot {
+    animation: blink 1s infinite alternate, pulseDot 1.2s infinite alternate;
+}
+.ai-typing-bubble .typing-dot:nth-child(2) {
+    animation-delay: 0.33s, 0.33s;
+}
+.ai-typing-bubble .typing-dot:nth-child(3) {
+    animation-delay: 0.66s, 0.66s;
+}
+@keyframes blink {
+    0% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+@keyframes fadeInBubble {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+@keyframes pulseBubble {
+    0% { box-shadow: 0 0 0 0 #5d5cff33; }
+    100% { box-shadow: 0 0 12px 4px #5d5cff33; }
+}
+@keyframes pulseDot {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.25); }
+}
 .response-controls {
     min-height: 70px;
     position: relative;

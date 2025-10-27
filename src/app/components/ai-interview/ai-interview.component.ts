@@ -1,5 +1,6 @@
+
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, AfterViewChecked, signal, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, Subject, switchMap } from 'rxjs';
 import { VoiceService } from '../../services/voice.service';
@@ -17,7 +18,15 @@ export type InputMode = 'speech' | 'text' | 'code';
   templateUrl: './ai-interview.component.html',
   styleUrls: ['./ai-interview.component.scss'],
 })
-export class AiInterviewComponent implements OnInit {
+export class AiInterviewComponent implements OnInit, AfterViewChecked {
+  ngOnDestroy(): void {
+    this.speechService.stopSpeaking();
+  }
+  ngAfterViewChecked(): void {
+    if (this.chatWindow && this.aiInFlight) {
+      this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
+    }
+  }
   public selectedJobRole = '.NET Developer';
   public selectedExperienceLevel = '2-4 years';
   public selectedInterviewDuration = '10min';
@@ -70,6 +79,7 @@ export class AiInterviewComponent implements OnInit {
   private lastProcessedIndex = 0;
   private interimTranscriptBuffer = '';
   private finalTranscriptSegments: string[] = [];
+  private transcriptQueue: string[] = [];
   private lastTranscriptChunk = '';
   private silenceTimeout: any = null;
   private recordSubscription: Subscription | null = null;
@@ -103,14 +113,23 @@ export class AiInterviewComponent implements OnInit {
     const sessionId = this.userService.sessionId;
     const user = this.userService.user;
     if (sessionId) {
-      this.aiStreamService.sendMessageToModel("I'm back").subscribe({
-        next: async (aiResponse: string) => {
+      const payload = {
+        candidate_name: user?.name,
+        job_role: user?.role,
+        experience_level: user?.experienceLevel,
+        interview_duration: user?.interviewDuration,
+        command: "I'm back, resume the interview.",
+        job_description: ''
+      };
+
+      this.aiStreamService.sendMessageToModel(JSON.stringify(payload, null, 2)).subscribe({
+        next: async (aiResponse: {response: string}) => {
           let responseText = '';
           try {
-            const parsed = JSON.parse(aiResponse);
-            responseText = parsed.response || '';
+            const parsed = JSON.parse(aiResponse?.response);
+            responseText = parsed.message || '';
           } catch {
-            responseText = aiResponse;
+            responseText = 'something went wrong';
           }
           this.conversationHistory.push({ speaker: 'ai', text: responseText });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
@@ -128,10 +147,10 @@ export class AiInterviewComponent implements OnInit {
       });
     } else if (user) {
       const payload = {
-  candidate_name: user.name,
-  job_role: user.role,
-  experience_level: user.experienceLevel,
-  interview_duration: user.interviewDuration,
+        candidate_name: user.name,
+        job_role: user.role,
+        experience_level: user.experienceLevel,
+        interview_duration: user.interviewDuration,
         command: "Start Interview",
         job_description: ''
       };
@@ -307,16 +326,19 @@ Begin by greeting the candidate warmly and then start the interview with your fi
             } catch {
               responseText = aiResponse;
             }
-            this.conversationHistory.push({ speaker: 'ai', text: responseText });
-            const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
-            await this.speechService.speak(spokenText, 'en-IN');
-            if (this.activeInputMode() === 'speech') {
-              this.speechService.startRecording();
-              this.isRecordingActive = true;
-            }
-            this.lastProcessedIndex = 0;
-            this.aiBuffer = [];
             this.aiInFlight = false;
+            setTimeout(() => {
+              this.conversationHistory.push({ speaker: 'ai', text: responseText });
+              const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
+              this.speechService.speak(spokenText, 'en-IN').then(() => {
+                if (this.activeInputMode() === 'speech') {
+                  this.speechService.startRecording();
+                  this.isRecordingActive = true;
+                }
+              });
+              this.lastProcessedIndex = 0;
+              this.aiBuffer = [];
+            }, 0);
           },
           error: (err) => {
             console.error('AI model error:', err);
@@ -331,10 +353,15 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   }
 
   startRecording(): void {
+  this.speechService.stopSpeaking();
     this.aiSpeaking.set(false);
     if (!this.recordSubscription) {
       this.recordSubscription = this.speechService.record$.subscribe({
         next: (results: any) => {
+            if (this.silenceTimeout) {
+            clearTimeout(this.silenceTimeout);
+            this.silenceTimeout = null;
+          }
           if (Array.isArray(results)) {
             this.interimTranscriptBuffer = '';
             for (const result of results) {
@@ -379,17 +406,18 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               if (!this.finalTranscriptSegments.includes(finalSegment)) {
                 this.finalTranscriptSegments.push(finalSegment);
               }
+              // Add to queue and show in chat immediately
+              this.transcriptQueue.push(finalSegment);
               this.userTranscript.set(this.finalTranscriptSegments.join(' '));
               this.lastTranscriptChunk = this.finalTranscriptSegments.join(' ');
-              this.conversationHistory.push({ speaker: 'user', text: this.lastTranscriptChunk });
-              this.processUserResponse(this.lastTranscriptChunk);
+              this.conversationHistory.push({ speaker: 'user', text: finalSegment });
               this.interimTranscriptBuffer = '';
               this.liveTranscript.set('');
               this.userSpeakingIndicator.set(true);
               setTimeout(() => {
                 this.userSpeakingIndicator.set(false);
               }, 1000);
-              this.finalTranscriptSegments = [];
+              // Do NOT process immediately; let silenceTimeout handle it
             }
           }
           const fullTranscript = this.finalTranscriptSegments.join(' ');
@@ -397,18 +425,17 @@ Begin by greeting the candidate warmly and then start the interview with your fi
             this.userTranscript.set(fullTranscript);
             this.lastTranscriptChunk = fullTranscript;
           }
-          if (this.silenceTimeout) {
-            clearTimeout(this.silenceTimeout);
-          }
+        
           this.silenceTimeout = setTimeout(() => {
-            const fullTranscript = this.finalTranscriptSegments.join(' ');
-            if (fullTranscript) {
-              this.userTranscript.set(fullTranscript);
-              this.conversationHistory.push({ speaker: 'user', text: fullTranscript });
-              this.processUserResponse(fullTranscript);
+            if (this.transcriptQueue.length > 0) {
+              const combined = this.transcriptQueue.join(' ');
+              this.userTranscript.set(combined);
+              this.processUserResponse(combined);
+              this.finalTranscriptSegments = [];
+              this.transcriptQueue = [];
             }
             this.finalTranscriptSegments = [];
-          }, 5000);
+          }, 8000);
         },
         error: (err) => {
           console.error('Recording error:', err);
@@ -443,9 +470,9 @@ Begin by greeting the candidate warmly and then start the interview with your fi
     this.activeInputMode.set('speech');
     this.speechService.stopSpeaking();
     if (this.speechService.isRecordingActive) {
-      this.speechService.stopRecording();
+      this.stopRecording();
     } else {
-      this.speechService.startRecording();
+      this.startRecording();
     }
     this.isRecordingActive = this.speechService.isRecordingActive;
   }

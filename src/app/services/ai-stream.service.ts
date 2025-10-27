@@ -14,7 +14,7 @@ export class AIStreamService {
     private userService: UserService
   ) {}
 
-  public sendMessageToModel(message: string): Observable<string> {
+  public sendMessageToModel(message: string): Observable<any> {
     console.log('Sending message to model:', message);
     let sessionId = this.userService?.sessionId;
     if (!sessionId) {
@@ -33,9 +33,9 @@ export class AIStreamService {
     };
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'x-api-key': 'sk-default-mQGXmVH9iXVv4Ao54nxsBGsgJxSqEJZs'
+      'x-api-key': 'sk-default-foozTPqe8GkoFaixlysYmVPb528bCo7v'
     });
-    return this.http.post(this.apiUrl, payload, { headers, responseType: 'text' });
+    return this.http.post(this.apiUrl, payload, { headers, responseType: 'json' });
   }
   
   private ws: WebSocket | null = null;

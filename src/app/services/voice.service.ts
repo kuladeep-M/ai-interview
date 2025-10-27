@@ -71,12 +71,15 @@ export class VoiceService implements OnDestroy {
       } else {
         utter.lang = 'en-US';
       }
+      utter.rate = 0.85; // Reduce voice speed
       utter.onend = () => {
         this.isSpeakingSubject.next(false);
         resolve();
       };
-      this.synthesis.speak(utter);
-      console.log('speakinggg')
+      setTimeout(() => {
+        this.synthesis.speak(utter);
+        console.log('speakinggg')
+      }, 120);
     });
   }
 
