@@ -1,13 +1,10 @@
 // speech-automation.service.ts - FINAL IMPLEMENTATION
 
 import { Injectable, OnDestroy, Inject } from '@angular/core';
-import { NEVER, Observable, repeat, retry, share, Subject, switchMap, tap } from 'rxjs';
+import { NEVER, Observable, repeat, retry, share, Subject, switchMap } from 'rxjs';
 import {
-  continuous,
-  final,
   SPEECH_SYNTHESIS_VOICES,
   SpeechRecognitionService,
-  takeUntilSaid,
 } from '@ng-web-apis/speech';
 
 @Injectable({ providedIn: 'root' })

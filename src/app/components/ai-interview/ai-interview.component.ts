@@ -18,6 +18,9 @@ export type InputMode = 'speech' | 'text' | 'code';
   styleUrls: ['./ai-interview.component.scss'],
 })
 export class AiInterviewComponent implements OnInit {
+  public selectedJobRole = '.NET Developer';
+  public selectedExperienceLevel = '2-4 years';
+  public selectedInterviewDuration = '10min';
   // Services
   private router = inject(Router);
   private userService = inject(UserService);
@@ -68,11 +71,8 @@ export class AiInterviewComponent implements OnInit {
   private interimTranscriptBuffer = '';
   private finalTranscriptSegments: string[] = [];
   private lastTranscriptChunk = '';
-  private transcriptBuffer = '';
   private silenceTimeout: any = null;
   private recordSubscription: Subscription | null = null;
-  private aiStreamSubscription: Subscription | null = null;
-  private wsUrl = 'ws://localhost:8080';
 
   ngOnInit(): void {
     const observer = new MutationObserver(() => {
@@ -128,9 +128,11 @@ export class AiInterviewComponent implements OnInit {
       });
     } else if (user) {
       const payload = {
-        candidate_name: user.name,
-        job_role: user.role,
-        experience_level: '',
+  candidate_name: user.name,
+  job_role: user.role,
+  experience_level: user.experienceLevel,
+  interview_duration: user.interviewDuration,
+        command: "Start Interview",
         job_description: ''
       };
       const firstMessage = `
@@ -198,8 +200,8 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   }
 
   onPassSkip(): void {
-    this.conversationHistory.push({ speaker: 'user', text: 'Pass / Skip' });
-    this.processUserResponse('Pass / Skip');
+    this.conversationHistory.push({ speaker: 'user', text: 'skip this question' });
+    this.processUserResponse('skip this question');
   }
 
   onTextAreaKeydown(event: KeyboardEvent): void {
@@ -405,7 +407,6 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               this.conversationHistory.push({ speaker: 'user', text: fullTranscript });
               this.processUserResponse(fullTranscript);
             }
-            this.transcriptBuffer = '';
             this.finalTranscriptSegments = [];
           }, 5000);
         },
@@ -430,7 +431,6 @@ Begin by greeting the candidate warmly and then start the interview with your fi
       this.recordSubscription.unsubscribe();
       this.recordSubscription = null;
     }
-    this.transcriptBuffer = '';
     if (this.silenceTimeout) {
       clearTimeout(this.silenceTimeout);
       this.silenceTimeout = null;

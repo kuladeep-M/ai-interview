@@ -20,8 +20,9 @@ export class InterviewStartComponent implements OnInit{
   }
   name: string = '';
   email: string = '';
-  role: string = '';
-  roles: string[] = ['Frontend Developer', 'Backend Developer', 'Fullstack Developer', 'Data Scientist', 'DevOps Engineer'];
+  role: string = '.NET Developer';
+  experienceLevel: string = '2-4 years';
+  interviewDuration: string = '10min';
 
   constructor(
     private router: Router,
@@ -34,7 +35,9 @@ export class InterviewStartComponent implements OnInit{
     this.userService.setUser({
       name: this.name,
       email: this.email,
-      role: this.role
+      role: this.role,
+      experienceLevel: this.experienceLevel,
+      interviewDuration: this.interviewDuration
     });
 
     // Navigate to interview screen

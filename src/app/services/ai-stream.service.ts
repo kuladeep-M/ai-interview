@@ -24,6 +24,7 @@ export class AIStreamService {
       }
     }
     const payload = {
+      role:"system",
       user_id: 'mem_cm7xmg15v0ghk0snc9yx26g1v',
       system_prompt_variables: {},
       agent_id: '68f951b6058210757bf615af',

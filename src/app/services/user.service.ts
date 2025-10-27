@@ -4,6 +4,8 @@ export interface UserData {
   name: string;
   email: string;
   role: string;
+  experienceLevel?: string;
+  interviewDuration?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +28,7 @@ export class UserService {
 
   setUser(user: UserData) {
     this._user.set(user);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   setSessionId(sessionId: string) {
