@@ -4,8 +4,13 @@
     style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;padding-top:16px;position: relative;">
     <div></div>
     <div style="display: flex; flex-direction: column; align-items:center;margin-left:110px;">
-      <span class="logo" style="font-size: 2rem; font-weight: 700; letter-spacing: 1px;">🤖 AI Interview</span>
-      <span class="sub-text" style="font-size: 1.1rem; color: #666; margin-top: 4px;">Voice Assistant</span>
+      <span class="logo" style="font-size: 2rem; font-weight: 700; letter-spacing: 1px;">
+        <div class="dashboard-logo-container"
+          style="display:flex;align-items:center;justify-content:center;">
+          <img src="assets/intelliview-logo.png" alt="IntelliView Logo"
+            style="height:64px;max-width:320px;object-fit:contain;" />
+        </div>
+      </span>
     </div>
     <div class="header-controls" style="display: flex; gap: 16px; align-items: center;margin-right: 15px;">
       <span class="time-limit">⏱ {{ formattedTimer }}</span>
@@ -14,7 +19,7 @@
   </div>
 
   <main class="main-content-panel" style="margin-top: 20px;">
-   
+
     <section class="ai-question-block">
       <div class="ai-speech-bubble">
         <p class="ai-status">
@@ -121,8 +126,7 @@
             </select>
           </div>
           <div class="code-editor-wrapper">
-            <ngx-monaco-editor [options]="codeEditorOptions" 
-            [(ngModel)]="codeEditorContent"
+            <ngx-monaco-editor [options]="codeEditorOptions" [(ngModel)]="codeEditorContent"
               style="height:300px;width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(44,62,80,0.10);">
             </ngx-monaco-editor>
           </div>
@@ -150,7 +154,8 @@
         </div>
         <div class="control-group center vertical-controls">
           <!-- Mic Button -->
-          <button class="btn btn-style btn-mic" (click)="toggleRecording()"  [disabled]="speechService.isSpeaking$ | async"
+          <button class="btn btn-style btn-mic" (click)="toggleRecording()"
+            [disabled]="speechService.isSpeaking$ | async"
             [class.active]="isRecordingActive && activeInputMode() === 'speech'">
             <span class="icon-mic">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -166,8 +171,8 @@
           </button>
 
           <!-- Keyboard Button -->
-          <button class="btn-style btn-text-mode" (click)="setInputMode('text')" [disabled]="speechService.isSpeaking$ | async"
-            [class.active]="activeInputMode() === 'text'">
+          <button class="btn-style btn-text-mode" (click)="setInputMode('text')"
+            [disabled]="speechService.isSpeaking$ | async" [class.active]="activeInputMode() === 'text'">
             <span class="icon-text">
               <!-- Keyboard icon without border, matching mic -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -186,8 +191,8 @@
           </button>
 
           <!-- Code Button -->
-          <button class="btn-style btn-code" (click)="setInputMode('code')"   [disabled]="speechService.isSpeaking$ | async"
-            [class.active]="activeInputMode() === 'code'">
+          <button class="btn-style btn-code" (click)="setInputMode('code')"
+            [disabled]="speechService.isSpeaking$ | async" [class.active]="activeInputMode() === 'code'">
             <span class="icon-code">
               <!-- Perfectly centered code icon: arrow and dash -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
