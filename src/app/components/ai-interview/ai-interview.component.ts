@@ -34,14 +34,14 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
   // Services
   private router = inject(Router);
   private userService = inject(UserService);
-  private speechService = inject(VoiceService);
+  public speechService = inject(VoiceService);
   private aiStreamService = inject(AIStreamService);
 
   // UI State
   chatWindow: HTMLElement | null = null;
   public showSidebar = true;
   public helperTools: WritableSignal<boolean> = signal(false);
-  public userName = 'Kuladeep';
+  public userName = 'U';
   public userSpeakingIndicator: WritableSignal<boolean> = signal(false);
   public showAISpeakingText: WritableSignal<boolean> = signal(true);
   public showUserSpeakingText: WritableSignal<boolean> = signal(true);
@@ -86,6 +86,7 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
   private recordSubscription: Subscription | null = null;
 
   ngOnInit(): void {
+    this.userName = this.userService.user?.name || 'U';
     const observer = new MutationObserver(() => {
       if (this.chatWindow) {
         this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
@@ -117,9 +118,9 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
       const payload = {
         candidate_name: user?.name,
         job_role: user?.role,
+        job_description: user?.description,
         experience_level: user?.experienceLevel,
         interview_duration: user?.interviewDuration,
-        job_description: ''
       };
 
       this.aiStreamService.sendMessageToModel("I'm back, resume the interview.",JSON.stringify(payload, null, 2)).subscribe({
@@ -151,7 +152,7 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
         job_role: user.role,
         experience_level: user.experienceLevel,
         interview_duration: user.interviewDuration,
-        job_description: ''
+        job_description: user.description
       };
       const firstMessage = `
 ${JSON.stringify(payload, null, 2)}
@@ -489,7 +490,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
               this.transcriptQueue = [];
             }
             this.finalTranscriptSegments = [];
-          }, 8000);
+          }, 4000);
         },
         error: (err) => {
           console.error('Recording error:', err);

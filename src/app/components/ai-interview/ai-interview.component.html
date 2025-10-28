@@ -13,11 +13,8 @@
     </div>
   </div>
 
-  <main class="main-content-panel">
-    <header class="main-header">
-      <h2 style="margin: 0">Technical Interview</h2>
-    </header>
-
+  <main class="main-content-panel" style="margin-top: 20px;">
+   
     <section class="ai-question-block">
       <div class="ai-speech-bubble">
         <p class="ai-status">
@@ -61,7 +58,7 @@
                     </defs>
                     <circle cx="20" cy="20" r="16" fill="#6C63FF" filter="url(#kShadow)" />
                     <text x="20" y="24" text-anchor="middle" font-size="18" fill="#fff" font-family="Arial, sans-serif"
-                      dominant-baseline="middle">K</text>
+                      dominant-baseline="middle">{{ userInitial }}</text>
                   </svg>
                 </ng-template>
               </div>
@@ -91,7 +88,7 @@
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="16" cy="20" r="14" fill="#6C63FF" />
                   <text x="16" y="22" text-anchor="middle" font-size="16" fill="#fff" font-family="Arial, sans-serif"
-                    dominant-baseline="middle">K</text>
+                    dominant-baseline="middle">{{ userInitial }}</text>
                 </svg>
               </div>
               <div class="chat-bubble user live minimal-bubble"
@@ -139,7 +136,7 @@
       <div class="response-controls">
 
         <div class="control-group left">
-          <button class="btn btn-skip" (click)="onPassSkip()">
+          <button class="btn btn-skip" (click)="onPassSkip()" [disabled]="speechService.isSpeaking$ | async">
             <span class="icon-skip">
               <!-- Double forward arrow icon -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -153,7 +150,7 @@
         </div>
         <div class="control-group center vertical-controls">
           <!-- Mic Button -->
-          <button class="btn btn-style btn-mic" (click)="toggleRecording()"
+          <button class="btn btn-style btn-mic" (click)="toggleRecording()"  [disabled]="speechService.isSpeaking$ | async"
             [class.active]="isRecordingActive && activeInputMode() === 'speech'">
             <span class="icon-mic">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -169,7 +166,7 @@
           </button>
 
           <!-- Keyboard Button -->
-          <button class="btn-style btn-text-mode" (click)="setInputMode('text')"
+          <button class="btn-style btn-text-mode" (click)="setInputMode('text')" [disabled]="speechService.isSpeaking$ | async"
             [class.active]="activeInputMode() === 'text'">
             <span class="icon-text">
               <!-- Keyboard icon without border, matching mic -->
@@ -189,7 +186,7 @@
           </button>
 
           <!-- Code Button -->
-          <button class="btn-style btn-code" (click)="setInputMode('code')"
+          <button class="btn-style btn-code" (click)="setInputMode('code')"   [disabled]="speechService.isSpeaking$ | async"
             [class.active]="activeInputMode() === 'code'">
             <span class="icon-code">
               <!-- Perfectly centered code icon: arrow and dash -->

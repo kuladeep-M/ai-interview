@@ -222,3 +222,86 @@
   color: #2ecc71;
   font-weight: 600;
 }
+.domain-scores {
+  margin-top: 1.5rem;
+  background: #f7f8fa;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(93, 92, 255, 0.08);
+}
+.domain-scores h4 {
+  margin-bottom: 0.75rem;
+  color: #5d5cff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.domain-scores ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.domain-scores li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(93, 92, 255, 0.04);
+  font-size: 1rem;
+}
+.domain-scores strong {
+  color: #222;
+  min-width: 140px;
+  font-weight: 600;
+}
+.domain-scores span {
+  color: #888;
+  margin-left: 0.5rem;
+  font-size: 0.95em;
+}
+.improvements {
+  margin-top: 1.5rem;
+  background: #fffbe6;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(93, 92, 255, 0.08);
+}
+.improvements h4 {
+  margin-bottom: 0.75rem;
+  color: #d4a200;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.improvements ul {
+  list-style: disc inside;
+  padding-left: 1rem;
+  margin: 0;
+}
+.improvements li {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #222;
+}
+.recommendation {
+  margin-top: 1.5rem;
+  background: #f7f8fa;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(93, 92, 255, 0.08);
+}
+.recommendation h4 {
+  margin-bottom: 0.75rem;
+  color: #5d5cff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.recommendation div {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #222;
+}
+.recommendation strong {
+  color: #5d5cff;
+  font-weight: 600;
+}

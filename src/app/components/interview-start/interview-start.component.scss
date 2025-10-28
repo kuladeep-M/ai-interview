@@ -16,6 +16,7 @@
 .form-group {
   margin-bottom: 1.5rem;
   text-align: left;
+  width: 300px;
 }
 
 .form-group label {
@@ -26,7 +27,8 @@
 
 .form-group input,
 .form-group select {
-  width: 300px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #ccc;

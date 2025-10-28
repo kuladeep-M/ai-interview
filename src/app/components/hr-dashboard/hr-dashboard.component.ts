@@ -15,6 +15,9 @@ export interface InterviewDetail {
   domainScore: string;
   overallSummary: string;
   avatarClass: string;
+  domainSkills?: { skill: string; score: number; remarks?: string }[];
+  improvementSuggestions?: string[];
+  recommendation?: { overall_decision: string; reason: string };
 }
 
 @Component({
@@ -47,7 +50,13 @@ export class HrDashboardComponent implements OnInit {
           console.log('Parsed interview entry:', parsed);
           // Defensive: ensure domain_score and generic_score are numbers
           const domainScore = typeof parsed.domain_evaluation?.domain_score === 'number' ? parsed.domain_evaluation.domain_score : Number(parsed.domain_evaluation?.domain_score) || 0;
-          
+          const domainSkills = Array.isArray(parsed.domain_evaluation?.domain_skills)
+            ? parsed.domain_evaluation.domain_skills.map((skill: any) => ({
+                skill: skill.skill,
+                score: skill.score,
+                remarks: skill.remarks
+              }))
+            : [];
           return {
             id: idx + 1,
             name: userData.name || parsed.candidate_name || 'Unknown',
@@ -59,7 +68,10 @@ export class HrDashboardComponent implements OnInit {
             confidenceLevel: parsed.confidence_level ? (parsed.confidence_level > 0.8 ? 'High' : parsed.confidence_level > 0.5 ? 'Medium' : 'Low') : 'N/A',
             domainScore: domainScore !== undefined ? `${domainScore * 10}%` : 'N/A',
             avatarClass: 'avatar-default',
-            overallSummary: parsed.feedback || 'No summary available.'
+            overallSummary: parsed.feedback || 'No summary available.',
+            domainSkills,
+            improvementSuggestions: parsed.improvement_suggestions || [],
+            recommendation: parsed.recommendation || undefined
           };
         }));
         console.log('Loaded interviews:', this.interviews);

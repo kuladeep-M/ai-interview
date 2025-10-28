@@ -52,9 +52,7 @@
         <div class="stat"><span>{{ selectedInterview()?.duration }}</span>
           <div>Duration</div>
         </div>
-        <div class="stat"><span>{{ selectedInterview()?.questionsAnswered }}</span>
-          <div>Questions Answered</div>
-        </div>
+       
         <div class="stat"><span>{{ selectedInterview()?.confidenceLevel }}</span>
           <div>Confidence Level</div>
         </div>
@@ -66,6 +64,26 @@
         <h4>Overall Summary</h4>
         <p>{{ selectedInterview()?.overallSummary }}</p>
       </div>
+       <div class="recommendation" *ngIf="selectedInterview()?.recommendation">
+        <h4>AI Recommendation</h4>
+        <div><strong>Decision:</strong> {{ selectedInterview()?.recommendation?.overall_decision }}</div>
+        <div><strong>Reason:</strong> {{ selectedInterview()?.recommendation?.reason }}</div>
+      </div>
+      <div class="domain-scores" *ngIf="selectedInterview()?.domainSkills">
+        <h4>Domain Level Scores</h4>
+        <ul>
+          <li *ngFor="let skill of selectedInterview()?.domainSkills">
+            <strong>{{ skill.skill }}:</strong><span *ngIf="skill.remarks"> {{ skill.remarks }}</span> <span style="margin-left:auto;font-weight:600;color:#5d5cff;width:70px;">{{ skill.score }} / 10</span>
+          </li>
+        </ul>
+      </div>
+      <div class="improvements" *ngIf="selectedInterview()?.improvementSuggestions?.length">
+        <h4>Improvement Suggestions</h4>
+        <ul>
+          <li *ngFor="let suggestion of selectedInterview()?.improvementSuggestions">{{ suggestion }}</li>
+        </ul>
+      </div>
+     
     </div>
   </section>
 </div>

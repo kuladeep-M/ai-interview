@@ -12,10 +12,9 @@
     <div class="form-group">
       <label for="role">Job Role</label>
       <select id="role" name="role" [(ngModel)]="role" required>
-        <option value=".NET Developer">.NET Developer</option>
-        <option value="Senior Frontend Developer">Senior Frontend Developer</option>
-        <option value="Java Developer">Java Developer</option>
-        <option value="Python Developer">Python Developer</option>
+        <option *ngFor="let job of jobRoles" [value]="job.value">
+          {{ job.label }}
+        </option>
       </select>
     </div>
     <div class="form-group">
