@@ -305,3 +305,45 @@
   color: #5d5cff;
   font-weight: 600;
 }
+.generic-skills {
+  margin-top: 1.5rem;
+  background: #f7f8fa;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(93, 92, 255, 0.08);
+}
+.generic-skills h4 {
+  margin-bottom: 0.75rem;
+  color: #5d5cff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.generic-skills ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.generic-skills li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(93, 92, 255, 0.04);
+  font-size: 1rem;
+}
+.generic-skills strong {
+  color: #222;
+  min-width: 140px;
+  font-weight: 600;
+}
+.generic-skills span {
+  color: #888;
+  margin-left: 0.5rem;
+  font-size: 0.95em;
+}
+.generic-skills li span[style] {
+  color: #5d5cff !important;
+  font-weight: 600;
+}

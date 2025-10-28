@@ -24,9 +24,9 @@
             <div class="name">{{ interview.name }}</div>
             <div class="role">{{ interview.role }}</div>
             <div class="score" [ngClass]="{
-              'success': interview.score >= 85,
-              'warning': interview.score >= 70 && interview.score < 85,
-              'danger': interview.score < 70
+              'success': interview.score >= 80,
+              'warning': interview.score >= 55 && interview.score < 80,
+              'danger': interview.score < 55
             }">{{ interview.score }}%</div>
             <div class="time">{{ interview.interviewTime }}</div>
           </div>
@@ -83,7 +83,14 @@
           <li *ngFor="let suggestion of selectedInterview()?.improvementSuggestions">{{ suggestion }}</li>
         </ul>
       </div>
-     
+      <div class="generic-skills" *ngIf="selectedInterview()?.genericSkills?.length">
+        <h4>Generic Skills</h4>
+        <ul>
+          <li *ngFor="let skill of selectedInterview()?.genericSkills">
+            <strong>{{ skill.skill }}:</strong><span *ngIf="skill.remarks"> {{ skill.remarks }}</span> <span style="margin-left:auto;font-weight:600;color:#5d5cff;width:100px;">{{ skill.score }} / 10</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </div>

@@ -4,6 +4,7 @@ import { AIStreamService } from '../../services/ai-stream.service';
 
 
 export interface InterviewDetail {
+  genericSkills?: { skill: string; score: number; remarks?: string }[];
   id: number;
   name: string;
   role: string;
@@ -57,6 +58,13 @@ export class HrDashboardComponent implements OnInit {
                 remarks: skill.remarks
               }))
             : [];
+          const genericSkills = Array.isArray(parsed.generic_evaluation?.generic_skills)
+            ? parsed.generic_evaluation.generic_skills.map((skill: any) => ({
+                skill: skill.skill,
+                score: skill.score,
+                remarks: skill.remarks
+              }))
+            : [];
           return {
             id: idx + 1,
             name: userData.name || parsed.candidate_name || 'Unknown',
@@ -70,6 +78,7 @@ export class HrDashboardComponent implements OnInit {
             avatarClass: 'avatar-default',
             overallSummary: parsed.feedback || 'No summary available.',
             domainSkills,
+            genericSkills,
             improvementSuggestions: parsed.improvement_suggestions || [],
             recommendation: parsed.recommendation || undefined
           };
