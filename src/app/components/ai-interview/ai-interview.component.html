@@ -140,7 +140,7 @@
       <div class="response-controls">
 
         <div class="control-group left">
-          <button class="btn btn-skip" (click)="onPassSkip()" [disabled]="speechService.isSpeaking$ | async">
+          <button class="btn btn-skip" (click)="onPassSkip()" >
             <span class="icon-skip">
               <!-- Double forward arrow icon -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -155,7 +155,7 @@
         <div class="control-group center vertical-controls">
           <!-- Mic Button -->
           <button class="btn btn-style btn-mic" (click)="toggleRecording()"
-            [disabled]="speechService.isSpeaking$ | async"
+            
             [class.active]="isRecordingActive && activeInputMode() === 'speech'">
             <span class="icon-mic">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -172,7 +172,7 @@
 
           <!-- Keyboard Button -->
           <button class="btn-style btn-text-mode" (click)="setInputMode('text')"
-            [disabled]="speechService.isSpeaking$ | async" [class.active]="activeInputMode() === 'text'">
+             [class.active]="activeInputMode() === 'text'">
             <span class="icon-text">
               <!-- Keyboard icon without border, matching mic -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -192,7 +192,7 @@
 
           <!-- Code Button -->
           <button class="btn-style btn-code" (click)="setInputMode('code')"
-            [disabled]="speechService.isSpeaking$ | async" [class.active]="activeInputMode() === 'code'">
+             [class.active]="activeInputMode() === 'code'">
             <span class="icon-code">
               <!-- Perfectly centered code icon: arrow and dash -->
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
