@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, AfterViewChecked, signal, WritableSignal, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription, Subject, switchMap } from 'rxjs';
+import { Subscription, Subject, switchMap, takeUntil } from 'rxjs';
 import { VoiceService } from '../../services/speech.service';
 import { AIStreamService } from '../../services/ai-stream.service';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
@@ -28,6 +28,7 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
       this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
     }
   }
+  destroy$: Subject<void> = new Subject<void>(); 
   public selectedJobRole = '.NET Developer';
   public selectedExperienceLevel = '2-4 years';
   public selectedInterviewDuration = '10min';
@@ -224,6 +225,8 @@ Begin by greeting the candidate warmly and then start the interview with your fi
 
   onPassSkip(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'skip this question', content: 'skip this question' });
+    this.speechService.stopRecording();
+    this.speechService.stopSpeaking();
     this.processUserResponse('skip this question');
   }
 
@@ -322,7 +325,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
             }
             return this.aiStreamService.sendMessageToModel(combined);
           })
-        ).subscribe({
+        ).pipe(takeUntil(this.destroy$)).subscribe({
           next: async (aiResponse: {response: string}) => {
             let responseText = '';
             try {
@@ -359,7 +362,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
                   this.speechService.pauseRecording();
                   this.isRecordingActive = false;
                 }
-                this.aiStreamService.sendMessageToModel(combined).subscribe({
+                this.aiStreamService.sendMessageToModel(combined).pipe(takeUntil(this.destroy$)).subscribe({
                   next: async (aiResponse: {response: string}) => {
                     let responseText = '';
                     try {
@@ -409,7 +412,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
   this.speechService.stopSpeaking();
     this.aiSpeaking.set(false);
     if (!this.recordSubscription) {
-      this.recordSubscription = this.speechService.record$.subscribe({
+      this.recordSubscription = this.speechService.record$.pipe(takeUntil(this.destroy$)).subscribe({
         next: (results: any) => {
             if (this.silenceTimeout) {
             clearTimeout(this.silenceTimeout);
