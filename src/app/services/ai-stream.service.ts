@@ -76,6 +76,16 @@ export class AIStreamService {
     }
   }
 
+  sanitizeJson(raw: string): any {
+  const cleaned = raw
+    .replace(/[’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[—]/g, '-');
+
+  return cleaned;
+}
+
+
   storeHistory(history: any) {
     const payload = {
       role: "system",
@@ -83,7 +93,7 @@ export class AIStreamService {
       system_prompt_variables: {},
       agent_id: '68fe20eba39d463331e03c5c',
       session_id: uuidv4(),
-      message: JSON.stringify(history)
+      message: this.sanitizeJson(JSON.stringify(history))
     };
     const headers = {
       'Content-Type': 'application/json',
