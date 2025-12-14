@@ -130,10 +130,11 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
           try {
             const parsed = JSON.parse(aiResponse?.response);
             responseText = parsed.message || '';
+            this.conversationHistory.push({ speaker: 'ai', text: responseText, content: parsed });
           } catch {
             responseText = 'something went wrong';
+            this.conversationHistory.push({ speaker: 'ai', text: responseText, content: ""});
           }
-          this.conversationHistory.push({ speaker: 'ai', text: responseText, content: aiResponse.response });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
           this.speechService.speak(spokenText, 'en-IN').then(() => {
             if (this.activeInputMode() === 'speech') {
@@ -167,10 +168,11 @@ Begin by greeting the candidate warmly and then start the interview with your fi
           try {
             const parsed = JSON.parse(aiResponse?.response);
             responseText = parsed.message || '';
+            this.conversationHistory.push({ speaker: 'ai', text: responseText,content: parsed });
           } catch {
             responseText = 'something went wrong';
+            this.conversationHistory.push({ speaker: 'ai', text: responseText,content: '' });
           }
-          this.conversationHistory.push({ speaker: 'ai', text: responseText,content: aiResponse.response });
           const spokenText = responseText.replace(/#+\s*/g, '').replace(/\*{1,3}/g, '');
           this.speechService.speak(spokenText, 'en-IN').then(() => {
             if (this.activeInputMode() === 'speech') {
@@ -225,6 +227,7 @@ Begin by greeting the candidate warmly and then start the interview with your fi
 
   onPassSkip(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'skip this question', content: 'skip this question' });
+    this.isRecordingActive = false;
     this.speechService.stopRecording();
     this.speechService.stopSpeaking();
     this.processUserResponse('skip this question');
