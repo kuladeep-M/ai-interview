@@ -15,7 +15,7 @@ export class AIStreamService {
   ) { }
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
-    'x-api-key': 'sk-default-foozTPqe8GkoFaixlysYmVPb528bCo7v'
+    'x-api-key': 'sk-default-ttO5z9yKDOTzowmRNrNjh1CfyVYtAjOw'
   });
   public sendMessageToModel(chatMessage: string, contex?: any): Observable<any> {
     console.log('Sending message to model:', chatMessage);
