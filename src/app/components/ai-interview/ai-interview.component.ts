@@ -156,12 +156,8 @@ export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy
         job_description: user.description
       };
       const firstMessage = `
-${JSON.stringify(payload, null, 2)}
-
-You are an AI Interviewer.
-Use the above candidate and job details to conduct a technical interview aligned with the provided job role and description.
-Begin by greeting the candidate warmly and then start the interview with your first question.`;
-      this.aiStreamService.sendMessageToModel("Start Interview",firstMessage).subscribe({
+${JSON.stringify(payload, null, 2)}`;
+      this.aiStreamService.sendMessageToModel("Start Interview",firstMessage,"system").subscribe({
         next:  (aiResponse: {response: string}) => {
           let responseText = '';
           try {
@@ -213,7 +209,8 @@ Begin by greeting the candidate warmly and then start the interview with your fi
 
   onEndInterview(): void {
     this.conversationHistory.push({ speaker: 'user', text: 'End Interview', content: 'End interview' });
-    this.aiStreamService.sendUserMessage('End Interview');
+    //this.aiStreamService.sendUserMessage('End Interview');
+    this.aiStreamService.sendMessageToModel("End interview",null,"system").subscribe();
     this.speechService.stopSpeaking();
     this.speechService.stopRecording();
     this.aiStreamService.storeHistory(this.conversationHistory);

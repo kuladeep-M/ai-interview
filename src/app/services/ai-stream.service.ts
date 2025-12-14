@@ -17,7 +17,7 @@ export class AIStreamService {
     'Content-Type': 'application/json',
     'x-api-key': 'sk-default-ttO5z9yKDOTzowmRNrNjh1CfyVYtAjOw'
   });
-  public sendMessageToModel(chatMessage: string, contex?: any): Observable<any> {
+  public sendMessageToModel(chatMessage: string, contex?: any,role : string| null = null): Observable<any> {
     console.log('Sending message to model:', chatMessage);
     let sessionId = this.userService?.sessionId;
     if (!sessionId) {
@@ -33,7 +33,7 @@ export class AIStreamService {
       system_prompt_variables: {},
       agent_id: '68f951b6058210757bf615af',
       session_id: sessionId,
-      message: JSON.stringify({ role: "user", context: contex || {}, message: chatMessage })
+      message: JSON.stringify({ role: role || "user", context: contex || {}, message: chatMessage })
     };
 
     return this.http.post(this.apiUrl, payload, { headers: this.headers, responseType: 'json' });
