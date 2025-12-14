@@ -93,7 +93,7 @@ export class AIStreamService {
     // Store in Lyzr API
     this.http.post(this.apiUrl, payload, { headers, responseType: 'json' }).subscribe({
       next: (r:any) => {
-        this.http.post('https://ai-interviewer---v1-default-rtdb.firebaseio.com/interview-data.json', JSON.stringify({ ...JSON.parse(r?.response), created_date: new Date().toISOString(),userData}) , { headers: header }).subscribe({
+        this.http.post('https://ai-interviewer---v1-default-rtdb.firebaseio.com/interview-data.json', JSON.stringify({ ...JSON.parse(r?.response?.replace(/\r?\n/g, '\\n')), created_date: new Date().toISOString(),userData}) , { headers: header }).subscribe({
           next: () => {
             console.log('History stored successfully (Firebase)');
           },
