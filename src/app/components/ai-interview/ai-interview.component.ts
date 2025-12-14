@@ -20,6 +20,7 @@ export type InputMode = 'speech' | 'text' | 'code';
 })
 export class AiInterviewComponent implements OnInit, AfterViewChecked, OnDestroy {
   ngOnDestroy(): void {
+    this.destroy$.next();
     this.speechService.stopRecording();
     this.speechService.stopSpeaking();
   }
